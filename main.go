@@ -1,19 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/gocolly/colly"
 )
 
 type Product struct {
-	name  string `json:"name"`
-	price string `json:"price"`
-	url   string `json:"url"`
+	Name  string `json:"name"`
+	Price string `json:"price"`
+	Url   string `json:"url"`
 }
 
 func main() {
-
 	// Se solicita al usuario que producto desea buscar
 	var productToSearch string
 
@@ -30,35 +31,32 @@ func main() {
 
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
 		product := Product{
-			name:  e.ChildText(".ui-search-item__title"),
-			price: e.ChildText("div.ui-search-price__second-line span.andes-money-amount__fraction"),
-			url:   e.ChildText("a.ui-search-item__group__element.ui-search-link"),
+			Name:  e.ChildText(".ui-search-item__title"),
+			Price: e.ChildText("div.ui-search-price__second-line span.andes-money-amount__fraction"),
+			Url:   e.ChildAttr("a", "href"),
 		}
 
-		// product := Product{}
-
-		// e.ForEach(".ui-search-item__title", func(_ int, prodName *colly.HTMLElement) {
-		// 	product.name = prodName.Text
-		// })
-
-		// e.ForEach(".andes-money-amount__fraction", func(_ int, prodPrice *colly.HTMLElement) {
-		// 	product.price = prodPrice.Text
-		// })
-
-		// e.ForEach("a.ui-search-item__group__element.ui-search-link", func(_ int, prodUrl *colly.HTMLElement) {
-		// 	product.url = prodUrl.Attr("href")
-		// })
-
 		products = append(products, product)
-
 	})
 
+	// Se visita el sitio y se imprimen los productos scrapeados
 	c.Visit(visitUrl)
 
 	for _, product := range products {
-		fmt.Println("Nombre:", product.name)
-		fmt.Println("Precio:", product.price)
-		fmt.Println("Url:", product.url)
+		fmt.Println("Nombre:", product.Name)
+		fmt.Println("Precio:", product.Price)
+		fmt.Println("Url:", product.Url)
 	}
 
+	saveAsJsonFile(products) // Guardamos los datos en un archivo
+}
+
+// Guarda un slice de productos como json
+func saveAsJsonFile(products []Product) {
+	data, err := json.MarshalIndent(products, "", " ")
+	if err != nil {
+		panic(err)
+	}
+
+	os.WriteFile("products.json", data, 0644)
 }
