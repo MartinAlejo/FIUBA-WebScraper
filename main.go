@@ -22,13 +22,26 @@ func main() {
 	fmt.Scanln(&productToSearch)
 
 	var visitUrl string = "https://listado.mercadolibre.com.ar/" + productToSearch
+	products := scrapData(visitUrl)
 
+	for _, product := range products {
+		fmt.Println("Nombre:", product.Name)
+		fmt.Println("Precio:", product.Price)
+		fmt.Println("Url:", product.Url)
+	}
+
+	saveAsJsonFile(products) // Guardamos los datos en un archivo
+}
+
+// Scrapea datos
+func scrapData(url string) []Product {
 	// Crea una nueva instancia de Colly
 	c := colly.NewCollector()
 
 	// Slice para almacenar los productos scrapeados
 	var products []Product
 
+	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
 		product := Product{
 			Name:  e.ChildText(".ui-search-item__title"),
@@ -39,16 +52,10 @@ func main() {
 		products = append(products, product)
 	})
 
-	// Se visita el sitio y se imprimen los productos scrapeados
-	c.Visit(visitUrl)
+	// Se visita el sitio a scrapear
+	c.Visit(url)
 
-	for _, product := range products {
-		fmt.Println("Nombre:", product.Name)
-		fmt.Println("Precio:", product.Price)
-		fmt.Println("Url:", product.Url)
-	}
-
-	saveAsJsonFile(products) // Guardamos los datos en un archivo
+	return products
 }
 
 // Guarda un slice de productos como json
