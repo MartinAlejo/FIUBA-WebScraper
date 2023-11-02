@@ -9,9 +9,9 @@ import (
 )
 
 type Product struct {
-	Name  string `json:"name"`
-	Price string `json:"price"`
-	Url   string `json:"url"`
+	Name  string //`json:"name"`
+	Price string //`json:"price"`
+	Url   string //`json:"url"`
 }
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
 		product := Product{
 			Name:  e.ChildText(".ui-search-item__title"),
-			Price: e.ChildText("div.ui-search-price__second-line span.andes-money-amount__fraction"),
+			Price: e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction"),
 			Url:   e.ChildAttr("a", "href"),
 		}
 
