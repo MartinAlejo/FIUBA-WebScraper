@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gocolly/colly"
 )
 
@@ -15,18 +16,32 @@ type Product struct {
 }
 
 func main() {
-	// Se solicita al usuario que producto desea buscar
-	var productToSearch string
+	raiseServer()
+}
 
-	fmt.Print("Ingresa un producto a buscar: ")
-	fmt.Scanln(&productToSearch)
+// Levanta un servidor, en el puerto 8080 que de momento devuelve todos los productos scrapeados al
+// hacer una peticion GET en el endpoint "/""
+func raiseServer() {
+	r := chi.NewRouter()     // Router de la libreria "chi"
+	r.Use(middleware.Logger) // TODO: Quitar (testing)
 
-	var visitUrl string = "https://listado.mercadolibre.com.ar/" + productToSearch
+	// Endpoints
+	r.Get("/", getProducts)
+
+	// Levantamos el servidor
+	err := http.ListenAndServe(":8080", r)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// Envia todos los productos scrapeados
+func getProducts(w http.ResponseWriter, r *http.Request) {
+	const visitUrl string = "https://listado.mercadolibre.com.ar/notebook"
 	products := scrapData(visitUrl)
 
-	//saveAsJsonFile(products) // Guardamos los datos en un archivo
-
-	raiseServer(products)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(products)
 }
 
 // Scrapea datos de una url dada, y devuelve los productos
@@ -49,32 +64,4 @@ func scrapData(url string) []Product {
 	c.Visit(url) // Se visita el sitio a scrapear
 
 	return products
-}
-
-// Escribe los productos recibidos en un archivo, en formato JSON
-// func saveAsJsonFile(products []Product) {
-// 	jsonData, err := json.MarshalIndent(products, "", " ")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	os.WriteFile("products.json", jsonData, 0644)
-// }
-
-// Levanta un servidor, en el puerto 8080 que de momento devuelve todos los productos scrapeados al
-// hacer una peticion GET en el endpoint "/""
-func raiseServer(products []Product) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(products)
-	})
-
-	srv := http.Server{
-		Addr: ":8080",
-	}
-
-	err := srv.ListenAndServe()
-	if err != nil {
-		panic(err)
-	}
 }
