@@ -29,25 +29,25 @@ func main() {
 	var products []Product
 
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
-		// product := Product{
-		// 	name:  e.ChildText(".ui-search-item__title"),
-		// 	price: e.ChildText(".andes-money-amount__fraction"),
-		// 	url:   e.ChildText("a.ui-search-item__group__element.ui-search-link"),
-		// } Otra forma de hacerlo (revisar)
+		product := Product{
+			name:  e.ChildText(".ui-search-item__title"),
+			price: e.ChildText("div.ui-search-price__second-line span.andes-money-amount__fraction"),
+			url:   e.ChildText("a.ui-search-item__group__element.ui-search-link"),
+		}
 
-		product := Product{}
+		// product := Product{}
 
-		e.ForEach(".ui-search-item__title", func(_ int, prodName *colly.HTMLElement) {
-			product.name = prodName.Text
-		})
+		// e.ForEach(".ui-search-item__title", func(_ int, prodName *colly.HTMLElement) {
+		// 	product.name = prodName.Text
+		// })
 
-		e.ForEach(".andes-money-amount__fraction", func(_ int, prodPrice *colly.HTMLElement) {
-			product.price = prodPrice.Text
-		})
+		// e.ForEach(".andes-money-amount__fraction", func(_ int, prodPrice *colly.HTMLElement) {
+		// 	product.price = prodPrice.Text
+		// })
 
-		e.ForEach("a.ui-search-item__group__element.ui-search-link", func(_ int, prodUrl *colly.HTMLElement) {
-			product.url = prodUrl.Attr("href")
-		})
+		// e.ForEach("a.ui-search-item__group__element.ui-search-link", func(_ int, prodUrl *colly.HTMLElement) {
+		// 	product.url = prodUrl.Attr("href")
+		// })
 
 		products = append(products, product)
 
