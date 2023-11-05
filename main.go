@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	mercadoLibreRouter "go-scraper/routes"
+	routes "go-scraper/routes"
 )
 
 func main() {
@@ -19,10 +19,10 @@ func raiseServer() {
 	mainRouter.Use(middleware.Logger) // TODO: Quitar (testing)
 
 	// Subrouters (dentro de cada uno se manejan los endpoints)
-	var mercadoLibreRouter *chi.Mux = mercadoLibreRouter.GetRouterMercadoLibre()
+	routerMercadoLibre := routes.MercadoLibreRouter()
 
 	// Montamos los subrouters sobre el principal y levantamos el servidor
-	mainRouter.Mount("/mercadolibre", mercadoLibreRouter)
+	mainRouter.Mount("/mercadolibre", routerMercadoLibre)
 
 	// Levantamos el servidor
 	err := http.ListenAndServe(":8080", mainRouter)
