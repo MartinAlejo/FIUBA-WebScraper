@@ -63,3 +63,24 @@ func ScrapFullH4rd(url string) []Product {
 
 	return products
 }
+
+func ScrapCompraGamer(url string) []Product {
+	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
+	fmt.Println(url)
+	var products []Product
+
+	// Se define el comportamiento al scrapear
+	c.OnHTML("", func(e *colly.HTMLElement) {
+		product := Product{
+			Name:  e.ChildText(""),
+			Price: e.ChildText(""),
+			Url:   e.ChildAttr("", ""),
+		}
+
+		products = append(products, product)
+	})
+
+	c.Visit(url) // Se visita el sitio a scrapear
+
+	return products
+}
