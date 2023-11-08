@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// Devuelve el subrouter utilizado para mercado libre (export)
+// Devuelve el subrouter utilizado para fullh4rd (export)
 func FullH4rdRouter() *chi.Mux {
 	routerFullH4rd := chi.NewRouter() // Subrouter de fullh4rd
 

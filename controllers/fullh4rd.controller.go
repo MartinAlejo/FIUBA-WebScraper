@@ -8,7 +8,6 @@ import (
 
 // Envia todos los productos scrapeados
 func FullH4rdGetProducts(w http.ResponseWriter, r *http.Request) {
-
 	productName := r.URL.Query().Get("product") // Se recibe el nombre de producto por query params
 
 	visitUrl := "https://www.fullh4rd.com.ar/cat/search/" + productName
