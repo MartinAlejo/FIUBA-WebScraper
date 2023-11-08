@@ -7,11 +7,11 @@ import (
 )
 
 // Devuelve el subrouter utilizado para mercado libre (export)
-func CompraGamerRouter() *chi.Mux {
-	routerCompraGamer := chi.NewRouter()
+func FravegaRouter() *chi.Mux {
+	routerFravega := chi.NewRouter()
 
 	// Endpoints del subrouter
-	routerCompraGamer.Get("/", controllers.CompraGamerGetProducts)
+	routerFravega.Get("/", controllers.FravegaGetProducts)
 
-	return routerCompraGamer
+	return routerFravega
 }
