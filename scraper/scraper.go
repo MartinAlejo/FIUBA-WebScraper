@@ -67,12 +67,12 @@ func ScrapFravega(url string) []Product {
 	var products []Product
 
 	// Se define el comportamiento al scrapear
-	c.OnHTML("article[data-test-id='product-layout']", func(e *colly.HTMLElement) {
+	c.OnHTML("article[data-test-id='result-item']", func(e *colly.HTMLElement) {
 
 		product := Product{
-			Name:  e.ChildText("span[data-test-id='product-title']"),
+			Name:  e.ChildText("span[class='sc-6321a7c8-0 jKvHol']"),
 			Price: e.ChildText("span.sc-ad64037f-0.ixxpWu"),
-			Url:   e.ChildAttr("a", "href"),
+			Url:   "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 		}
 
 		products = append(products, product)
