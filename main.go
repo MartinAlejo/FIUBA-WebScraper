@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-
 	routes "go-scraper/routes"
 )
 
@@ -20,10 +19,12 @@ func raiseServer() {
 	// Subrouters (dentro de cada uno se manejan los endpoints)
 	routerMercadoLibre := routes.MercadoLibreRouter()
 	routerFullH4rd := routes.FullH4rdRouter()
+	routerFravega := routes.FravegaRouter()
 
 	// Montamos los subrouters sobre el principal y levantamos el servidor
 	mainRouter.Mount("/mercadolibre", routerMercadoLibre)
 	mainRouter.Mount("/fullh4rd", routerFullH4rd)
+	mainRouter.Mount("/fravega", routerFravega)
 
 	// Levantamos el servidor
 	err := http.ListenAndServe(":8080", mainRouter)

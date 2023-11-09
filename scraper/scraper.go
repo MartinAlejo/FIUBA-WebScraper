@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -50,6 +51,28 @@ func ScrapFullH4rd(url string) []Product {
 			Name:  e.ChildText("h3"),
 			Price: price,
 			Url:   "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
+		}
+
+		products = append(products, product)
+	})
+
+	c.Visit(url) // Se visita el sitio a scrapear
+
+	return products
+}
+
+func ScrapFravega(url string) []Product {
+	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
+	fmt.Println(url)
+	var products []Product
+
+	// Se define el comportamiento al scrapear
+	c.OnHTML("article[data-test-id='result-item']", func(e *colly.HTMLElement) {
+
+		product := Product{
+			Name:  e.ChildText("span[class='sc-6321a7c8-0 jKvHol']"),
+			Price: e.ChildText("span.sc-ad64037f-0.ixxpWu"),
+			Url:   "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 		}
 
 		products = append(products, product)
