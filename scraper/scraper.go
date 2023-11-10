@@ -1,7 +1,6 @@
 package scraper
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -13,7 +12,7 @@ type Product struct {
 	Url   string `json:"url"`
 }
 
-// Scrapea datos de una url dada, y devuelve los productos
+// Scrapea datos de mercadolibre, a partir de una url, y devuelve los productos
 func ScrapDataMercadoLibre(url string) []Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []Product
@@ -34,7 +33,7 @@ func ScrapDataMercadoLibre(url string) []Product {
 	return products
 }
 
-// Scrapea datos de una url dada, y devuelve los productos
+// Scrapea datos de fullh4rd, a partir de una url, y devuelve los productos
 func ScrapFullH4rd(url string) []Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []Product
@@ -61,9 +60,9 @@ func ScrapFullH4rd(url string) []Product {
 	return products
 }
 
+// Scrapea datos de fravega, a partir de una url, y devuelve los productos
 func ScrapFravega(url string) []Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
-	fmt.Println(url)
 	var products []Product
 
 	// Se define el comportamiento al scrapear
