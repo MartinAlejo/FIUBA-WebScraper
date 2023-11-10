@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"go-scraper/utils"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -8,7 +9,7 @@ import (
 
 type Product struct {
 	Name  string `json:"name"`
-	Price string `json:"price"`
+	Price int    `json:"price"`
 	Url   string `json:"url"`
 }
 
@@ -21,7 +22,7 @@ func ScrapDataMercadoLibre(url string) []Product {
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
 		product := Product{
 			Name:  e.ChildText(".ui-search-item__title"),
-			Price: e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction"),
+			Price: utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction")),
 			Url:   e.ChildAttr("a", "href"),
 		}
 
@@ -48,7 +49,7 @@ func ScrapFullH4rd(url string) []Product {
 
 		product := Product{
 			Name:  e.ChildText("h3"),
-			Price: price,
+			Price: utils.ConvertPriceToNumber(price),
 			Url:   "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
 		}
 
@@ -70,7 +71,7 @@ func ScrapFravega(url string) []Product {
 
 		product := Product{
 			Name:  e.ChildText("span[class='sc-6321a7c8-0 jKvHol']"),
-			Price: e.ChildText("span.sc-ad64037f-0.ixxpWu"),
+			Price: utils.ConvertPriceToNumber(e.ChildText("span.sc-ad64037f-0.ixxpWu")),
 			Url:   "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 		}
 
