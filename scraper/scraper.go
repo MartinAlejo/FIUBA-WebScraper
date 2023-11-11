@@ -7,20 +7,14 @@ import (
 	"github.com/gocolly/colly"
 )
 
-type Product struct {
-	Name  string `json:"name"`
-	Price int    `json:"price"`
-	Url   string `json:"url"`
-}
-
 // Scrapea datos de mercadolibre, a partir de una url, y devuelve los productos
-func ScrapDataMercadoLibre(url string) []Product {
+func ScrapDataMercadoLibre(url string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
-	var products []Product
+	var products []utils.Product
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
-		product := Product{
+		product := utils.Product{
 			Name:  e.ChildText(".ui-search-item__title"),
 			Price: utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction")),
 			Url:   e.ChildAttr("a", "href"),
@@ -35,9 +29,9 @@ func ScrapDataMercadoLibre(url string) []Product {
 }
 
 // Scrapea datos de fullh4rd, a partir de una url, y devuelve los productos
-func ScrapFullH4rd(url string) []Product {
+func ScrapFullH4rd(url string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
-	var products []Product
+	var products []utils.Product
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML("div[class='item product-list']", func(e *colly.HTMLElement) {
@@ -47,7 +41,7 @@ func ScrapFullH4rd(url string) []Product {
 			price = elements[0]
 		}
 
-		product := Product{
+		product := utils.Product{
 			Name:  e.ChildText("h3"),
 			Price: utils.ConvertPriceToNumber(price),
 			Url:   "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
@@ -62,14 +56,14 @@ func ScrapFullH4rd(url string) []Product {
 }
 
 // Scrapea datos de fravega, a partir de una url, y devuelve los productos
-func ScrapFravega(url string) []Product {
+func ScrapFravega(url string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
-	var products []Product
+	var products []utils.Product
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML("article[data-test-id='result-item']", func(e *colly.HTMLElement) {
 
-		product := Product{
+		product := utils.Product{
 			Name:  e.ChildText("span[class='sc-6321a7c8-0 jKvHol']"),
 			Price: utils.ConvertPriceToNumber(e.ChildText("span.sc-ad64037f-0.ixxpWu")),
 			Url:   "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
