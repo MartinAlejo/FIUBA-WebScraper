@@ -64,7 +64,7 @@ func ScrapFullH4rd(url string) []utils.Product {
 }
 
 // Scrapea datos de fravega, a partir de una url, y devuelve los productos
-func ScrapFravega(url string) []utils.Product {
+func ScrapFravega(url string, ram string, ssd string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 
@@ -79,6 +79,15 @@ func ScrapFravega(url string) []utils.Product {
 
 		products = append(products, product)
 	})
+
+	if ram != "" {
+		url += fmt.Sprintf("+%sGB", ram)
+	}
+	if ssd != "" {
+		url += fmt.Sprintf("+%s+ssd", ssd)
+	}
+
+	fmt.Println(url)
 
 	c.Visit(url) // Se visita el sitio a scrapear
 
