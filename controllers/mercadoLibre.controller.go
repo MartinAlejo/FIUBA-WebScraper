@@ -10,11 +10,12 @@ import (
 
 // Envia todos los productos scrapeados
 func MercadoLibreGetProducts(w http.ResponseWriter, r *http.Request) {
-	productName := r.URL.Query().Get("product") // Se recibe el nombre de producto por query params
-	sort := r.URL.Query().Get("sort")           // Se recibe el sort por query params ("asc", "desc", "")
+	sort := r.URL.Query().Get("sort") // Se recibe el sort por query params ("asc", "desc", "")
+	ram := r.URL.Query().Get("ram")   // La memoria ram (4, 8, etc)
 
-	visitUrl := "https://listado.mercadolibre.com.ar/" + productName
-	products := scraper.ScrapDataMercadoLibre(visitUrl) // Se obtienen los productos scrapeados
+	visitUrl := "https://listado.mercadolibre.com.ar/computacion/laptops-accesorios/notebooks"
+
+	products := scraper.ScrapNotebooksMercadoLibre(visitUrl, ram) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)

@@ -1,14 +1,15 @@
 package scraper
 
 import (
+	"fmt"
 	"go-scraper/utils"
 	"strings"
 
 	"github.com/gocolly/colly"
 )
 
-// Scrapea datos de mercadolibre, a partir de una url, y devuelve los productos
-func ScrapDataMercadoLibre(url string) []utils.Product {
+// Scrapea notebooks de mercadolibre, a partir de una url, y devuelve los productos
+func ScrapNotebooksMercadoLibre(url string, ram string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 
@@ -23,7 +24,14 @@ func ScrapDataMercadoLibre(url string) []utils.Product {
 		products = append(products, product)
 	})
 
-	c.Visit(url) // Se visita el sitio a scrapear
+	// Se hace el filtro de ram (si existe)
+	if ram != "" {
+		url += fmt.Sprintf("/%s-GB", ram)
+	}
+
+	//fmt.Println(url + "/notebooks_NoIndex_True") TODO: Quitar (test)
+
+	c.Visit(url + "/notebooks_NoIndex_True") // Se visita el sitio a scrapear
 
 	return products
 }
