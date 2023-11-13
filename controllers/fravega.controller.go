@@ -11,12 +11,13 @@ import (
 // Envia todos los productos scrapeados
 func FravegaGetProducts(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort") // Se recibe el sort por query params ("asc", "desc", "")
-	ram := r.URL.Query().Get("ram")   // Se recibe la ram del producto
-	ssd := r.URL.Query().Get("ssd")   //Se recibe la ssd
+	cpu := r.URL.Query().Get("cpu")
+	ram := r.URL.Query().Get("ram") // Se recibe la ram del producto
+	ssd := r.URL.Query().Get("ssd") //Se recibe la ssd
 
 	visitUrl := "https://www.fravega.com/l/?keyword=notebook"
 
-	products := scraper.ScrapFravega(visitUrl, ram, ssd) // Se obtienen los productos scrapeados
+	products := scraper.ScrapFravega(visitUrl, cpu, ram, ssd) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)
