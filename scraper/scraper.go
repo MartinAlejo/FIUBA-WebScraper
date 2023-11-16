@@ -9,7 +9,7 @@ import (
 )
 
 // Scrapea notebooks de mercadolibre, a partir de una url, y devuelve los productos
-func ScrapNotebooksMercadoLibre(url string, ram string) []utils.Product {
+func ScrapNotebooksMercadoLibre(url string, ram string, storage string, inches string, processor string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 
@@ -24,14 +24,29 @@ func ScrapNotebooksMercadoLibre(url string, ram string) []utils.Product {
 		products = append(products, product)
 	})
 
-	// Se hace el filtro de ram (si existe)
+	//TODO: Validaciones de input
+
+	// Se hacen los filtros de params
 	if ram != "" {
 		url += fmt.Sprintf("/%s-GB", ram)
 	}
 
-	//fmt.Println(url + "/notebooks_NoIndex_True") TODO: Quitar (test)
+	if storage != "" {
+		url += fmt.Sprintf("/%s-GB-capacidad-del-ssd", storage)
+	}
 
-	c.Visit(url + "/notebooks_NoIndex_True") // Se visita el sitio a scrapear
+	if inches != "" {
+		url += fmt.Sprintf("/%s-pulgadas", inches)
+	}
+
+	if processor != "" {
+		url += fmt.Sprintf("/%s", processor)
+	}
+
+	// Se visita el sitio a scrapear y se devuelven los productos
+	fmt.Println(url + "/nuevo/notebooks_NoIndex_True") //TODO: Quitar (test)
+
+	c.Visit(url + "/nuevo/notebooks_NoIndex_True")
 
 	return products
 }
