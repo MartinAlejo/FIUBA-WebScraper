@@ -9,9 +9,10 @@ import (
 )
 
 // Scrapea notebooks de mercadolibre, a partir de una url, y devuelve los productos
-func ScrapNotebooksMercadoLibre(url string, ram string, storage string, inches string, processor string) []utils.Product {
+func ScrapNotebooksMercadoLibre(url string, ram string, storage string, inches string, processor string, minPrice string, maxPrice string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
+	urlSuffix := "/nuevo/notebooks"
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
@@ -24,7 +25,7 @@ func ScrapNotebooksMercadoLibre(url string, ram string, storage string, inches s
 		products = append(products, product)
 	})
 
-	//TODO: Validaciones de input
+	//TODO: Validaciones de input (query params)
 
 	// Se hacen los filtros de params
 	if ram != "" {
@@ -43,10 +44,22 @@ func ScrapNotebooksMercadoLibre(url string, ram string, storage string, inches s
 		url += fmt.Sprintf("/%s", processor)
 	}
 
-	// Se visita el sitio a scrapear y se devuelven los productos
-	fmt.Println(url + "/nuevo/notebooks_NoIndex_True") //TODO: Quitar (test)
+	if minPrice != "" || maxPrice != "" {
+		if minPrice == "" {
+			minPrice = "0"
+		}
 
-	c.Visit(url + "/nuevo/notebooks_NoIndex_True")
+		if maxPrice == "" {
+			maxPrice = "0"
+		}
+
+		urlSuffix += fmt.Sprintf("_PriceRange_%s-%s", minPrice, maxPrice)
+	}
+
+	// Se visita el sitio a scrapear y se devuelven los productos
+	fmt.Println(url + urlSuffix + "_NoIndex_True") //TODO: Quitar (test)
+
+	c.Visit(url + urlSuffix + "_NoIndex_True")
 
 	return products
 }

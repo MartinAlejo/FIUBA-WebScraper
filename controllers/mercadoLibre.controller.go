@@ -15,10 +15,12 @@ func MercadoLibreGetProducts(w http.ResponseWriter, r *http.Request) {
 	inches := r.URL.Query().Get("inches")       // Las pulgadas de la pantalla (16, 17, etc)
 	storage := r.URL.Query().Get("storage")     // Espacio en disco del ssd (256, 512, etc)
 	processor := r.URL.Query().Get("processor") // Linea del procesador (intel, amd, apple)
+	minPrice := r.URL.Query().Get("minPrice")   // Precio minimo (200000, por ejemplo)
+	maxPrice := r.URL.Query().Get("maxPrice")   // Precio maximo (2000000, por ejemplo)
 
 	visitUrl := "https://listado.mercadolibre.com.ar/computacion/laptops-accesorios/notebooks"
 
-	products := scraper.ScrapNotebooksMercadoLibre(visitUrl, ram, storage, inches, processor) // Se obtienen los productos scrapeados
+	products := scraper.ScrapNotebooksMercadoLibre(visitUrl, ram, storage, inches, processor, minPrice, maxPrice) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)
