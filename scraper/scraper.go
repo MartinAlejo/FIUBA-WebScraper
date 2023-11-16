@@ -92,7 +92,7 @@ func ScrapFullH4rd(url string) []utils.Product {
 }
 
 // Scrapea datos de fravega, a partir de una url, y devuelve los productos
-func ScrapFravega(url string, ram string, storage string, processor string, minPrice string, maxPrice string) []utils.Product {
+func ScrapFravega(url string, ram string, inches string, storage string, processor string, minPrice string, maxPrice string) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 
@@ -118,6 +118,10 @@ func ScrapFravega(url string, ram string, storage string, processor string, minP
 
 	if processor != "" {
 		url += fmt.Sprintf("+%s", processor)
+	}
+
+	if inches != "" {
+		url += fmt.Sprintf("&tamano-de-pantalla=%s-pulgadas", inches)
 	}
 
 	if minPrice != "" || maxPrice != "" {
