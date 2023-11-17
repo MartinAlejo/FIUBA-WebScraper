@@ -27,7 +27,7 @@ func ScrapNotebooksMercadoLibre(url string, scrapSettings *utils.Settings) []uti
 	//TODO: Validaciones de input (query params)
 
 	// Se aplican los settings/filtros de scrapeo
-	visitUrl := applyScrapSettings(url, scrapSettings)
+	visitUrl := applyScrapSettingsMercadoLibre(url, scrapSettings)
 
 	// Se visita el sitio a scrapear y se devuelven los productos
 	fmt.Println(visitUrl) //TODO: Quitar (test)
@@ -37,8 +37,9 @@ func ScrapNotebooksMercadoLibre(url string, scrapSettings *utils.Settings) []uti
 	return products
 }
 
-// Funcion auxiliar, aplica los filtros de busqueda para mercadolibre y devuelve el string de busqueda
-func applyScrapSettings(url string, scrapSettings *utils.Settings) string {
+// Funcion auxiliar, aplica los settings de busqueda sobre una url para mercadolibre y devuelve
+// una nueva url
+func applyScrapSettingsMercadoLibre(url string, scrapSettings *utils.Settings) string {
 	urlSuffix := "/nuevo/notebooks"
 
 	// Se aplican los settings para scrapear
