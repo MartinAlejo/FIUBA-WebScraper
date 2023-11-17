@@ -5,10 +5,21 @@ import (
 	"strings"
 )
 
+// Struct utilizado para generar productos
 type Product struct {
 	Name  string `json:"name"`
 	Price int    `json:"price"`
 	Url   string `json:"url"`
+}
+
+// Struct utilizado para almacenar la configuracion para scrapear
+type Settings struct {
+	Ram       string // La memoria ram (4, 8, etc)
+	Inches    string // Las pulgadas de la pantalla (16, 17, etc)
+	Storage   string // Espacio en disco del ssd (256, 512, etc)
+	Processor string // Linea del procesador (intel, amd, apple)
+	MinPrice  string // Precio minimo (200000, por ejemplo)
+	MaxPrice  string // Precio maximo (2000000, por ejemplo)
 }
 
 // Convierte un precio de formato string a un entero

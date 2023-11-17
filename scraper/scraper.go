@@ -9,10 +9,9 @@ import (
 )
 
 // Scrapea notebooks de mercadolibre, a partir de una url, y devuelve los productos
-func ScrapNotebooksMercadoLibre(url string, ram string, storage string, inches string, processor string, minPrice string, maxPrice string) []utils.Product {
+func ScrapNotebooksMercadoLibre(url string, scrapSettings *utils.Settings) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
-	urlSuffix := "/nuevo/notebooks"
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
@@ -27,41 +26,54 @@ func ScrapNotebooksMercadoLibre(url string, ram string, storage string, inches s
 
 	//TODO: Validaciones de input (query params)
 
-	// Se hacen los filtros de params
-	if ram != "" {
-		url += fmt.Sprintf("/%s-GB", ram)
-	}
-
-	if storage != "" {
-		url += fmt.Sprintf("/%s-GB-capacidad-del-ssd", storage)
-	}
-
-	if inches != "" {
-		url += fmt.Sprintf("/%s-pulgadas", inches)
-	}
-
-	if processor != "" {
-		url += fmt.Sprintf("/%s", processor)
-	}
-
-	if minPrice != "" || maxPrice != "" {
-		if minPrice == "" {
-			minPrice = "0"
-		}
-
-		if maxPrice == "" {
-			maxPrice = "0"
-		}
-
-		urlSuffix += fmt.Sprintf("_PriceRange_%s-%s", minPrice, maxPrice)
-	}
+	// Se aplican los settings/filtros de scrapeo
+	visitUrl := applyScrapSettings(url, scrapSettings)
 
 	// Se visita el sitio a scrapear y se devuelven los productos
-	fmt.Println(url + urlSuffix + "_NoIndex_True") //TODO: Quitar (test)
+	fmt.Println(visitUrl) //TODO: Quitar (test)
 
-	c.Visit(url + urlSuffix + "_NoIndex_True")
+	c.Visit(visitUrl)
 
 	return products
+}
+
+// Funcion auxiliar, aplica los filtros de busqueda para mercadolibre y devuelve el string de busqueda
+func applyScrapSettings(url string, scrapSettings *utils.Settings) string {
+	urlSuffix := "/nuevo/notebooks"
+
+	// Se aplican los settings para scrapear
+	if scrapSettings.Ram != "" {
+		url += fmt.Sprintf("/%s-GB", scrapSettings.Ram)
+	}
+
+	if scrapSettings.Storage != "" {
+		url += fmt.Sprintf("/%s-GB-capacidad-del-ssd", scrapSettings.Storage)
+	}
+
+	if scrapSettings.Inches != "" {
+		url += fmt.Sprintf("/%s-pulgadas", scrapSettings.Inches)
+	}
+
+	if scrapSettings.Processor != "" {
+		url += fmt.Sprintf("/%s", scrapSettings.Processor)
+	}
+
+	if scrapSettings.MinPrice != "" || scrapSettings.MaxPrice != "" {
+		if scrapSettings.MinPrice == "" {
+			scrapSettings.MinPrice = "0"
+		}
+
+		if scrapSettings.MaxPrice == "" {
+			scrapSettings.MaxPrice = "0"
+		}
+
+		urlSuffix += fmt.Sprintf("_PriceRange_%s-%s", scrapSettings.MinPrice, scrapSettings.MaxPrice)
+	}
+
+	// Se crea y devuelve la url que finalmente se va a scrapear
+	visitUrl := url + urlSuffix + "_NoIndex_True"
+
+	return visitUrl
 }
 
 // Scrapea datos de fullh4rd, a partir de una url, y devuelve los productos
