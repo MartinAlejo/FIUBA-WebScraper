@@ -10,17 +10,20 @@ import (
 
 // Envia todos los productos scrapeados
 func FravegaGetProducts(w http.ResponseWriter, r *http.Request) {
-	sort := r.URL.Query().Get("sort")           // Se recibe el sort por query params ("asc", "desc", "")
-	ram := r.URL.Query().Get("ram")             // Se recibe la ram del producto
-	inches := r.URL.Query().Get("inches")       // Se recibe el tamanio de pantalla
-	storage := r.URL.Query().Get("storage")     // Se recibe la capacidad de memoria
-	processor := r.URL.Query().Get("processor") // Se recibe el procesador
-	minPrice := r.URL.Query().Get("minPrice")   // Precio minimo (200000, por ejemplo)
-	maxPrice := r.URL.Query().Get("maxPrice")   // Precio maximo (2000000, por ejemplo)
+	sort := r.URL.Query().Get("sort") // Se recibe el sort por query params ("asc", "desc", "")
+
+	scrapSettings := utils.Settings{
+		Ram:       r.URL.Query().Get("ram"),
+		Inches:    r.URL.Query().Get("inches"),
+		Storage:   r.URL.Query().Get("storage"),
+		Processor: r.URL.Query().Get("processor"),
+		MinPrice:  r.URL.Query().Get("minPrice"),
+		MaxPrice:  r.URL.Query().Get("maxPrice"),
+	}
 
 	visitUrl := "https://www.fravega.com/l/?keyword=notebook"
 
-	products := scraper.ScrapFravega(visitUrl, ram, inches, storage, processor, minPrice, maxPrice) // Se obtienen los productos scrapeados
+	products := scraper.ScrapFravega(visitUrl, &scrapSettings) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)
