@@ -184,7 +184,7 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 }
 
 // Scrapea datos de fravega, a partir de una url, y devuelve los productos
-func ScrapFravega(url string, ram string, inches string, storage string, processor string, minPrice string, maxPrice string) []utils.Product {
+func ScrapFravega(url string, scrapSettings *utils.Settings) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 
@@ -200,37 +200,40 @@ func ScrapFravega(url string, ram string, inches string, storage string, process
 		products = append(products, product)
 	})
 
-	if ram != "" {
-		url += fmt.Sprintf("+%sGB", ram)
-	}
-
-	if storage != "" {
-		url += fmt.Sprintf("+%s+ssd", storage)
-	}
-
-	if processor != "" {
-		url += fmt.Sprintf("+%s", processor)
-	}
-
-	if inches != "" {
-		url += fmt.Sprintf("&tamano-de-pantalla=%s-pulgadas", inches)
-	}
-
-	if minPrice != "" || maxPrice != "" {
-		if minPrice == "" {
-			minPrice = "1"
-		}
-
-		if maxPrice == "" {
-			maxPrice = "9999999999999999999"
-		}
-
-		url += fmt.Sprintf("&precio=%s-a-%s", minPrice, maxPrice)
-	}
-
+	url = applyScrapSettingsFravega(url, scrapSettings)
 	fmt.Println(url)
-
 	c.Visit(url) // Se visita el sitio a scrapear
 
 	return products
+}
+
+func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings) string {
+	if scrapSettings.Ram != "" {
+		url += fmt.Sprintf("+%sGB", scrapSettings.Ram)
+	}
+
+	if scrapSettings.Storage != "" {
+		url += fmt.Sprintf("+%s+ssd", scrapSettings.Storage)
+	}
+
+	if scrapSettings.Processor != "" {
+		url += fmt.Sprintf("+%s", scrapSettings.Processor)
+	}
+
+	if scrapSettings.Inches != "" {
+		url += fmt.Sprintf("&tamano-de-pantalla=%s-pulgadas", scrapSettings.Inches)
+	}
+
+	if scrapSettings.MinPrice != "" || scrapSettings.MaxPrice != "" {
+		if scrapSettings.MinPrice == "" {
+			scrapSettings.MinPrice = "1"
+		}
+
+		if scrapSettings.MaxPrice == "" {
+			scrapSettings.MaxPrice = "9999999999999999999"
+		}
+
+		url += fmt.Sprintf("&precio=%s-a-%s", scrapSettings.MinPrice, scrapSettings.MaxPrice)
+	}
+	return url
 }
