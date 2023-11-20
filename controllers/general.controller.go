@@ -40,8 +40,8 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 	result := url[len(prefixToRemove):]
 
 	fullh4rdUrl := appendUrl + "/api/fullh4rd" + result
-	fraveaUrl := appendUrl + "/api/mercadolibre" + result
-	mercadolibreUrl := appendUrl + "/api/fravega" + result
+	fravegaUrl := appendUrl + "/api/fravega" + result
+	mercadolibreUrl := appendUrl + "/api/mercadolibre" + result
 
 	// Use channels to collect the results concurrently
 	fullH4rdCh := make(chan []utils.Product)
@@ -67,7 +67,7 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		defer wg.Done()
-		fravegaProducts, _ := MakeAPICall(fraveaUrl)
+		fravegaProducts, _ := MakeAPICall(fravegaUrl)
 		fravegaCh <- fravegaProducts
 	}()
 
