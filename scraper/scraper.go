@@ -110,24 +110,27 @@ func ScrapFullH4rd(url string, scrapSettings *utils.Settings) []utils.Product {
 			Url:   "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
 		}
 
-		if maxPrice > 0 || minPrice > 0 {
-			if maxPrice != 0 && minPrice == 0 {
-				if product.Price < int(maxPrice) {
-					products = append(products, product)
-				}
-			} else if maxPrice == 0 && minPrice != 0 {
-				if product.Price > int(minPrice) {
-					products = append(products, product)
-				}
-			} else if maxPrice != 0 && minPrice != 0 {
-				if product.Price > int(minPrice) && product.Price < int(maxPrice) {
-					products = append(products, product)
+		if verifyProductFullH4rd(product.Name, scrapSettings) {
+
+			if maxPrice > 0 || minPrice > 0 {
+				if maxPrice != 0 && minPrice == 0 {
+					if product.Price < int(maxPrice) {
+						products = append(products, product)
+					}
+				} else if maxPrice == 0 && minPrice != 0 {
+					if product.Price > int(minPrice) {
+						products = append(products, product)
+					}
+				} else if maxPrice != 0 && minPrice != 0 {
+					if product.Price > int(minPrice) && product.Price < int(maxPrice) {
+						products = append(products, product)
+					}
 				}
 
+			} else {
+				products = append(products, product)
 			}
 
-		} else {
-			products = append(products, product)
 		}
 
 	})
@@ -181,6 +184,47 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 	visitUrl := url
 
 	return visitUrl
+}
+
+func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
+
+	lowerName := strings.ToLower(name)
+
+	if strings.Contains(lowerName, "notebook") || strings.Contains(lowerName, "laptop") {
+
+		if !(scrapSettings.Processor == "") {
+			if !strings.Contains(lowerName, scrapSettings.Processor) {
+				return false
+			}
+		}
+
+		if !(scrapSettings.Ram == "") {
+			ram := scrapSettings.Ram + `gb`
+			if !strings.Contains(lowerName, ram) {
+				return false
+			}
+		}
+
+		if !(scrapSettings.Storage == "") {
+			storage := scrapSettings.Storage + `gb`
+			if !strings.Contains(lowerName, storage) {
+				return false
+			}
+		}
+
+		if !(scrapSettings.Inches == "") {
+			inches := scrapSettings.Inches + `"`
+			if !strings.Contains(lowerName, inches) {
+				return false
+			}
+		}
+
+		return true
+
+	} else {
+		return false
+	}
+
 }
 
 // Scrapea datos de fravega, a partir de una url, y devuelve los productos
