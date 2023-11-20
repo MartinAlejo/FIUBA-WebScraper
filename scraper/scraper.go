@@ -252,12 +252,17 @@ func ScrapFravega(url string, scrapSettings *utils.Settings) []utils.Product {
 }
 
 func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings) string {
-	if scrapSettings.Ram != "" {
-		url += fmt.Sprintf("+%sGB", scrapSettings.Ram)
-	}
 
 	if scrapSettings.Storage != "" {
-		url += fmt.Sprintf("+%s+ssd", scrapSettings.Storage)
+		if scrapSettings.Storage == "1000" {
+			url += fmt.Sprintf("+%s+1TB", scrapSettings.Storage)
+		} else {
+			url += fmt.Sprintf("+%sGB", scrapSettings.Storage)
+		}
+	}
+
+	if scrapSettings.Ram != "" {
+		url += fmt.Sprintf("+%sGB", scrapSettings.Ram)
 	}
 
 	if scrapSettings.Processor != "" {
