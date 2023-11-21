@@ -6,6 +6,7 @@ import (
 	"go-scraper/utils"
 	"io"
 	"net/http"
+	"strconv"
 	"sync"
 )
 
@@ -35,6 +36,7 @@ func MakeAPICall(url string) ([]utils.Product, error) {
 func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 
 	url := r.URL.String()
+	quantity, _ := strconv.Atoi(r.URL.Query().Get("quantity"))
 	appendUrl := "http://localhost:8080"
 	prefixToRemove := "/api/general"
 	result := url[len(prefixToRemove):]
@@ -84,12 +86,29 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 	mercadolibreProducts := <-mercadolibreCh
 	fravegaProducts := <-fravegaCh
 
+	// Calcular la cantidad deseada para cada fuente de productos
+	sourceQuantity := quantity / 3
+
+	if quantity != 0 {
+		// Limitar la cantidad de productos de cada fuente
+		fullH4rdProducts = limitProducts(fullH4rdProducts, sourceQuantity)
+		mercadolibreProducts = limitProducts(mercadolibreProducts, sourceQuantity)
+		fravegaProducts = limitProducts(fravegaProducts, sourceQuantity)
+	}
+
 	// Concatenate the slices
 	allProducts := append(fullH4rdProducts, mercadolibreProducts...)
 	allProducts = append(allProducts, fravegaProducts...)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)
+}
+
+func limitProducts(products []utils.Product, limit int) []utils.Product {
+	if limit >= 0 && limit < len(products) {
+		return products[:limit]
+	}
+	return products
 }
 
 /* Funcion sin concurrencia

@@ -255,7 +255,7 @@ func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings) string
 
 	if scrapSettings.Storage != "" {
 		if scrapSettings.Storage == "1000" {
-			url += fmt.Sprintf("+%s+1TB", scrapSettings.Storage)
+			url += "+1TB"
 		} else {
 			url += fmt.Sprintf("+%sGB", scrapSettings.Storage)
 		}
