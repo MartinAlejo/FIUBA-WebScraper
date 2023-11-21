@@ -10,11 +10,20 @@ import (
 
 // Envia todos los productos scrapeados
 func FullH4rdGetProducts(w http.ResponseWriter, r *http.Request) {
-	productName := r.URL.Query().Get("product") // Se recibe el nombre de producto por query params
-	sort := r.URL.Query().Get("sort")           // Se recibe el sort por query params ("asc", "desc", "")
 
-	visitUrl := "https://www.fullh4rd.com.ar/cat/search/" + productName
-	products := scraper.ScrapFullH4rd(visitUrl) // Se obtienen los productos scrapeados
+	sort := r.URL.Query().Get("sort") // Se recibe el sort por query params ("asc", "desc", "")
+
+	scrapSettings := utils.Settings{
+		Ram:       r.URL.Query().Get("ram"),
+		Inches:    r.URL.Query().Get("inches"),
+		Storage:   r.URL.Query().Get("storage"),
+		Processor: r.URL.Query().Get("processor"),
+		MinPrice:  r.URL.Query().Get("minPrice"),
+		MaxPrice:  r.URL.Query().Get("maxPrice"),
+	}
+
+	visitUrl := "https://www.fullh4rd.com.ar/cat/search/notebook"
+	products := scraper.ScrapFullH4rd(visitUrl, &scrapSettings) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)

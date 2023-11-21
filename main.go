@@ -15,16 +15,18 @@ func main() {
 // Levanta un servidor en el puerto 8080
 func raiseServer() {
 	mainRouter := chi.NewRouter() // Router principal (libreria "chi")
-	
+
 	// Subrouters (dentro de cada uno se manejan los endpoints)
 	routerMercadoLibre := routes.MercadoLibreRouter()
 	routerFullH4rd := routes.FullH4rdRouter()
 	routerFravega := routes.FravegaRouter()
+	routerGeneral := routes.GeneralRouter()
 
 	// Montamos los subrouters sobre el principal y levantamos el servidor
 	mainRouter.Mount("/api/mercadolibre", routerMercadoLibre)
 	mainRouter.Mount("/api/fullh4rd", routerFullH4rd)
 	mainRouter.Mount("/api/fravega", routerFravega)
+	mainRouter.Mount("/api/general", routerGeneral)
 
 	// Levantamos el servidor
 	err := http.ListenAndServe(":8080", mainRouter)
