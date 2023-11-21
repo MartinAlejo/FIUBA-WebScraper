@@ -86,10 +86,10 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 	mercadolibreProducts := <-mercadolibreCh
 	fravegaProducts := <-fravegaCh
 
-	// Calcular la cantidad deseada para cada fuente de productos
-	sourceQuantity := quantity / 3
-
 	if quantity != 0 {
+		// Calcular la cantidad deseada para cada fuente de productos
+		sourceQuantity := quantity / 3
+
 		// Limitar la cantidad de productos de cada fuente
 		fullH4rdProducts = limitProducts(fullH4rdProducts, sourceQuantity)
 		mercadolibreProducts = limitProducts(mercadolibreProducts, sourceQuantity)
