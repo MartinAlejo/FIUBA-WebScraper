@@ -21,7 +21,7 @@ func FravegaGetProducts(w http.ResponseWriter, r *http.Request) {
 		MaxPrice:  r.URL.Query().Get("maxPrice"),
 	}
 
-	visitUrl := "https://www.fravega.com/l/?keyword=notebook"
+	visitUrl := "https://www.fravega.com/l/informatica/?keyword=notebook"
 
 	products := scraper.ScrapFravega(visitUrl, &scrapSettings) // Se obtienen los productos scrapeados
 

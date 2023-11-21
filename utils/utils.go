@@ -70,3 +70,10 @@ func CmpProductDesc(a, b Product) int {
 
 	return 0
 }
+
+func LimitProducts(products []Product, limit int) []Product {
+	if limit >= 0 && limit < len(products) {
+		return products[:limit]
+	}
+	return products
+}

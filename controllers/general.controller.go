@@ -91,9 +91,9 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 		sourceQuantity := quantity / 3
 
 		// Limitar la cantidad de productos de cada fuente
-		fullH4rdProducts = limitProducts(fullH4rdProducts, sourceQuantity)
-		mercadolibreProducts = limitProducts(mercadolibreProducts, sourceQuantity)
-		fravegaProducts = limitProducts(fravegaProducts, sourceQuantity)
+		fullH4rdProducts = utils.LimitProducts(fullH4rdProducts, sourceQuantity)
+		mercadolibreProducts = utils.LimitProducts(mercadolibreProducts, sourceQuantity)
+		fravegaProducts = utils.LimitProducts(fravegaProducts, sourceQuantity)
 	}
 
 	// Concatenate the slices
@@ -102,13 +102,6 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)
-}
-
-func limitProducts(products []utils.Product, limit int) []utils.Product {
-	if limit >= 0 && limit < len(products) {
-		return products[:limit]
-	}
-	return products
 }
 
 /* Funcion sin concurrencia
