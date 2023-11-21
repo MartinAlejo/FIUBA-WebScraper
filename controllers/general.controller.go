@@ -36,7 +36,7 @@ func MakeAPICall(url string) ([]utils.Product, error) {
 func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 
 	url := r.URL.String()
-	quantity, _ := strconv.Atoi(r.URL.Query().Get("quantity"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	appendUrl := "http://localhost:8080"
 	prefixToRemove := "/api/general"
 	result := url[len(prefixToRemove):]
@@ -86,14 +86,16 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 	mercadolibreProducts := <-mercadolibreCh
 	fravegaProducts := <-fravegaCh
 
-	if quantity != 0 {
+	if limit != 0 {
+		// TODO: CAMBIAR (bugs y casos bordes)
+
 		// Calcular la cantidad deseada para cada fuente de productos
-		sourceQuantity := quantity / 3
+		sourceLimit := limit / 3
 
 		// Limitar la cantidad de productos de cada fuente
-		fullH4rdProducts = utils.LimitProducts(fullH4rdProducts, sourceQuantity)
-		mercadolibreProducts = utils.LimitProducts(mercadolibreProducts, sourceQuantity)
-		fravegaProducts = utils.LimitProducts(fravegaProducts, sourceQuantity)
+		fullH4rdProducts = utils.LimitProducts(fullH4rdProducts, sourceLimit)
+		mercadolibreProducts = utils.LimitProducts(mercadolibreProducts, sourceLimit)
+		fravegaProducts = utils.LimitProducts(fravegaProducts, sourceLimit)
 	}
 
 	// Concatenate the slices
