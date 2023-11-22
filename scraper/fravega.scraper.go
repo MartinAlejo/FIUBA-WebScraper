@@ -8,7 +8,7 @@ import (
 )
 
 // Scrapea datos de fravega, a partir de una url, y devuelve los productos
-func ScrapFravega(url string, scrapSettings *utils.Settings) []utils.Product {
+func ScrapFravega(url string, scrapSettings utils.Settings) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 
@@ -24,7 +24,7 @@ func ScrapFravega(url string, scrapSettings *utils.Settings) []utils.Product {
 		products = append(products, product)
 	})
 
-	url = applyScrapSettingsFravega(url, scrapSettings)
+	url = applyScrapSettingsFravega(url, &scrapSettings)
 	fmt.Println(url)
 	c.Visit(url) // Se visita el sitio a scrapear
 

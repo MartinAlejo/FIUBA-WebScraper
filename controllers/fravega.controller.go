@@ -23,7 +23,7 @@ func FravegaGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	visitUrl := "https://www.fravega.com/l/informatica/?keyword=notebook"
 
-	products := scraper.ScrapFravega(visitUrl, &scrapSettings) // Se obtienen los productos scrapeados
+	products := scraper.ScrapFravega(visitUrl, scrapSettings) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)

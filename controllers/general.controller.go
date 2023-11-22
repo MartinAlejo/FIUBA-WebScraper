@@ -13,7 +13,7 @@ import (
 // Envia las notebooks scrapeadas de Mercadolibre, Fravega y Fullh4rd
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
-	//TODO: Quiza usar los scrapers en vez de hacer fetchs (mas directo)
+	//TODO: Quiza usar los scrapers directamente en vez de pasar por fetchs
 
 	// Se generan la URLs para hacer los fetchs (api calls)
 	url := r.URL.String()
@@ -67,6 +67,7 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	mercadolibreProducts := <-mercadolibreCh
 	fravegaProducts := <-fravegaCh
 
+	// Se traen los productos hasta un limite
 	if limit != 0 {
 		// TODO: Arreglar/cambiar (bugs y casos bordes)
 

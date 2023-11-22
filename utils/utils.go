@@ -20,7 +20,7 @@ type Settings struct {
 	Processor string // Linea del procesador (intel, amd, apple)
 	MinPrice  string // Precio minimo (200000, por ejemplo)
 	MaxPrice  string // Precio maximo (2000000, por ejemplo)
-}
+} //TODO: (Quiza) Agregar "rangos" para todos los parametros (minStorage, maxStorage, minRam, etc)
 
 // Convierte un precio de formato string a un entero
 func ConvertPriceToNumber(price string) int {

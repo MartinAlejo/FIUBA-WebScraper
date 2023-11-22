@@ -23,7 +23,7 @@ func MercadoLibreGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	visitUrl := "https://listado.mercadolibre.com.ar/computacion/laptops-accesorios/notebooks"
 
-	products := scraper.ScrapNotebooksMercadoLibre(visitUrl, &scrapSettings) // Se obtienen los productos scrapeados
+	products := scraper.ScrapNotebooksMercadoLibre(visitUrl, scrapSettings) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)

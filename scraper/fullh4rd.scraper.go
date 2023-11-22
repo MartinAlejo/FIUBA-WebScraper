@@ -10,11 +10,11 @@ import (
 )
 
 // Scrapea datos de fullh4rd, a partir de una url, y devuelve los productos
-func ScrapFullH4rd(url string, scrapSettings *utils.Settings) []utils.Product {
+func ScrapFullH4rd(url string, scrapSettings utils.Settings) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 	// Se aplican los settings/filtros de scrapeo
-	visitUrl := applyScrapSettingsFullH4rd(url, scrapSettings)
+	visitUrl := applyScrapSettingsFullH4rd(url, &scrapSettings)
 
 	minPrice, err := strconv.ParseFloat(scrapSettings.MinPrice, 64)
 	if err != nil {
@@ -41,7 +41,7 @@ func ScrapFullH4rd(url string, scrapSettings *utils.Settings) []utils.Product {
 			Url:   "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
 		}
 
-		if verifyProductFullH4rd(product.Name, scrapSettings) {
+		if verifyProductFullH4rd(product.Name, &scrapSettings) {
 
 			if maxPrice > 0 || minPrice > 0 {
 				if maxPrice != 0 && minPrice == 0 {

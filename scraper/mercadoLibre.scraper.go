@@ -8,7 +8,7 @@ import (
 )
 
 // Scrapea notebooks de mercadolibre, a partir de una url, y devuelve los productos
-func ScrapNotebooksMercadoLibre(url string, scrapSettings *utils.Settings) []utils.Product {
+func ScrapNotebooksMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
 
@@ -26,7 +26,7 @@ func ScrapNotebooksMercadoLibre(url string, scrapSettings *utils.Settings) []uti
 	//TODO: Validaciones de input (query params)
 
 	// Se aplican los settings/filtros de scrapeo
-	visitUrl := applyScrapSettingsMercadoLibre(url, scrapSettings)
+	visitUrl := applyScrapSettingsMercadoLibre(url, &scrapSettings)
 
 	// Se visita el sitio a scrapear y se devuelven los productos
 	//fmt.Println(visitUrl) //TODO: Quitar (test)

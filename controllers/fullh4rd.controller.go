@@ -23,7 +23,7 @@ func FullH4rdGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	visitUrl := "https://www.fullh4rd.com.ar/cat/search/notebook"
-	products := scraper.ScrapFullH4rd(visitUrl, &scrapSettings) // Se obtienen los productos scrapeados
+	products := scraper.ScrapFullH4rd(visitUrl, scrapSettings) // Se obtienen los productos scrapeados
 
 	if sort == "asc" {
 		slices.SortFunc(products, utils.CmpProductAsc)
