@@ -71,6 +71,7 @@ func CmpProductDesc(a, b Product) int {
 	return 0
 }
 
+// A partir de un array de productos, devuelve hasta un limite del mismo
 func LimitProducts(products []Product, limit int) []Product {
 	if limit >= 0 && limit < len(products) {
 		return products[:limit]

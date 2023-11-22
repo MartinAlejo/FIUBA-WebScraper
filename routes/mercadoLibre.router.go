@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// Devuelve el subrouter utilizado para mercado libre (export)
+// Devuelve el subrouter utilizado para mercado libre
 func MercadoLibreRouter() *chi.Mux {
 	routerMercadoLibre := chi.NewRouter() // Subrouter de mercadolibre
 
