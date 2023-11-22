@@ -9,8 +9,19 @@ import (
 
 // Scrapea datos de fravega, a partir de una url, y devuelve los productos
 func ScrapFravega(url string, scrapSettings utils.Settings) []utils.Product {
-	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
+
 	var products []utils.Product
+	// scrap products from page 1 to 10
+	for i := 1; i <= 10; i++ {
+		products = *scrapFravegaPage(applyScrapSettingsFravega(url, &scrapSettings, fmt.Sprintf("%d", i)), &products)
+	}
+
+	return products
+}
+
+func scrapFravegaPage(url string, products *[]utils.Product) *[]utils.Product {
+
+	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML("article[data-test-id='result-item']", func(e *colly.HTMLElement) {
@@ -21,17 +32,14 @@ func ScrapFravega(url string, scrapSettings utils.Settings) []utils.Product {
 			Url:   "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 		}
 
-		products = append(products, product)
+		*products = append(*products, product)
 	})
 
-	url = applyScrapSettingsFravega(url, &scrapSettings)
-	fmt.Println(url)
 	c.Visit(url) // Se visita el sitio a scrapear
-
 	return products
 }
 
-func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings) string {
+func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings, pageNumber string) string {
 
 	if scrapSettings.Storage != "" {
 		if scrapSettings.Storage == "1000" {
@@ -63,6 +71,10 @@ func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings) string
 		}
 
 		url += fmt.Sprintf("&precio=%s-a-%s", scrapSettings.MinPrice, scrapSettings.MaxPrice)
+	}
+
+	if pageNumber != "1" {
+		url += fmt.Sprintf("&page=%s", pageNumber)
 	}
 	return url
 }
