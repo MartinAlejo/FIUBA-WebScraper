@@ -2,9 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
+	"go-scraper/scraper"
 	"go-scraper/utils"
-	"io"
 	"net/http"
 	"strconv"
 	"sync"
@@ -13,18 +12,16 @@ import (
 // Envia las notebooks scrapeadas de Mercadolibre, Fravega y Fullh4rd
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
-	//TODO: Quiza usar los scrapers directamente en vez de pasar por fetchs
+	scrapSettings := utils.Settings{
+		Ram:       r.URL.Query().Get("ram"),
+		Inches:    r.URL.Query().Get("inches"),
+		Storage:   r.URL.Query().Get("storage"),
+		Processor: r.URL.Query().Get("processor"),
+		MinPrice:  r.URL.Query().Get("minPrice"),
+		MaxPrice:  r.URL.Query().Get("maxPrice"),
+	}
 
-	// Se generan la URLs para hacer los fetchs (api calls)
-	url := r.URL.String()
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-	appendUrl := "http://localhost:8080"
-	prefixToRemove := "/api/general"
-	result := url[len(prefixToRemove):]
-
-	fullh4rdUrl := appendUrl + "/api/fullh4rd" + result
-	fravegaUrl := appendUrl + "/api/fravega" + result
-	mercadolibreUrl := appendUrl + "/api/mercadolibre" + result
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Se recibe el limite de productos a scrapear
 
 	// Se usan canales para guardar los resultados al trabajar de forma concurrente
 	fullH4rdCh := make(chan []utils.Product)
@@ -35,22 +32,25 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
 	wg.Add(3)
 
-	// Se hacen fetchs de forma concurrente para scrapear los productos (y se almacenan en los canales)
+	// Se scrapean las notebooks de los 3 sitios (de forma concurrente, con goroutines)
 	go func() {
 		defer wg.Done()
-		fullH4rdProducts, _ := makeApiCall(fullh4rdUrl)
+		visitUrl := "https://www.fullh4rd.com.ar/cat/search/notebook"
+		fullH4rdProducts := scraper.ScrapFullH4rd(visitUrl, scrapSettings)
 		fullH4rdCh <- fullH4rdProducts
 	}()
 
 	go func() {
 		defer wg.Done()
-		mercadolibreProducts, _ := makeApiCall(mercadolibreUrl)
+		visitUrl := "https://listado.mercadolibre.com.ar/computacion/laptops-accesorios/notebooks"
+		mercadolibreProducts := scraper.ScrapMercadoLibre(visitUrl, scrapSettings)
 		mercadolibreCh <- mercadolibreProducts
 	}()
 
 	go func() {
 		defer wg.Done()
-		fravegaProducts, _ := makeApiCall(fravegaUrl)
+		visitUrl := "https://www.fravega.com/l/informatica/?keyword=notebook"
+		fravegaProducts := scraper.ScrapFravega(visitUrl, scrapSettings)
 		fravegaCh <- fravegaProducts
 	}()
 
@@ -113,27 +113,3 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)
 } */
-
-// Funcion auxiliar, se usa para hacer llamadas a la API (fetchs)
-func makeApiCall(url string) ([]utils.Product, error) {
-
-	var products []utils.Product
-
-	response, err := http.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("error making request: %v", err)
-	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error making request: %v", err)
-	}
-
-	err = json.Unmarshal(body, &products)
-	if err != nil {
-		return nil, fmt.Errorf("error making request: %v", err)
-	}
-
-	return products, nil
-}
