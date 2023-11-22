@@ -8,7 +8,7 @@ import (
 	"slices"
 )
 
-// Envia todos los productos scrapeados
+// Envia las notebooks scrapeadas de Fravega
 func FravegaGetProducts(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort") // Se recibe el sort por query params ("asc", "desc", "")
 
