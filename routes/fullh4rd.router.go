@@ -11,7 +11,7 @@ func FullH4rdRouter() *chi.Mux {
 	routerFullH4rd := chi.NewRouter() // Subrouter de fullh4rd
 
 	// Endpoints del subrouter
-	routerFullH4rd.Get("/", controllers.FullH4rdGetProducts)
+	routerFullH4rd.Get("/", controllers.FullH4rdGetNotebooks)
 
 	return routerFullH4rd
 }

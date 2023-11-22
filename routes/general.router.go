@@ -11,7 +11,7 @@ func GeneralRouter() *chi.Mux {
 	routerGeneral := chi.NewRouter()
 
 	// Endpoints del subrouter
-	routerGeneral.Get("/", controllers.GeneralGetProducts)
+	routerGeneral.Get("/", controllers.GeneralGetNotebooks)
 
 	return routerGeneral
 }

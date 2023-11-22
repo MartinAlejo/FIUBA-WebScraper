@@ -11,7 +11,7 @@ func MercadoLibreRouter() *chi.Mux {
 	routerMercadoLibre := chi.NewRouter() // Subrouter de mercadolibre
 
 	// Endpoints del subrouter
-	routerMercadoLibre.Get("/", controllers.MercadoLibreGetProducts)
+	routerMercadoLibre.Get("/", controllers.MercadoLibreGetNotebooks)
 
 	return routerMercadoLibre
 }

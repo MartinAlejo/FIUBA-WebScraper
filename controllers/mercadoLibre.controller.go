@@ -9,7 +9,7 @@ import (
 )
 
 // Envia las notebooks scrapeadas de Mercadolibre
-func MercadoLibreGetProducts(w http.ResponseWriter, r *http.Request) {
+func MercadoLibreGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort") // Se recibe el sort por query params ("asc", "desc", "")
 
 	scrapSettings := utils.Settings{

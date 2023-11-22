@@ -11,7 +11,7 @@ func FravegaRouter() *chi.Mux {
 	routerFravega := chi.NewRouter()
 
 	// Endpoints del subrouter
-	routerFravega.Get("/", controllers.FravegaGetProducts)
+	routerFravega.Get("/", controllers.FravegaGetNotebooks)
 
 	return routerFravega
 }
