@@ -15,6 +15,7 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	//TODO: Quiza usar los scrapers en vez de hacer fetchs (mas directo)
 
+	// Se generan la URLs para hacer los fetchs (api calls)
 	url := r.URL.String()
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	appendUrl := "http://localhost:8080"
@@ -86,10 +87,10 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(allProducts)
 }
 
-/* Funcion sin concurrencia
+/* Version sin concurrencia
 TODO: Hacerla funcionar y comparar tiempos (para mostrarle al profesor la diferencia)
 
-func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
+func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	url := r.URL.String()
 	appendUrl := "http://localhost:8080"
@@ -112,7 +113,7 @@ func GeneralGetProducts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(allProducts)
 } */
 
-// Funcion auxiliar, se usa para hacer llamadas a la API
+// Funcion auxiliar, se usa para hacer llamadas a la API (fetchs)
 func makeApiCall(url string) ([]utils.Product, error) {
 
 	var products []utils.Product
