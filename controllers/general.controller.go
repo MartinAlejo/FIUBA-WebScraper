@@ -5,13 +5,14 @@ import (
 	"go-scraper/scraper"
 	"go-scraper/utils"
 	"net/http"
+	"slices"
 	"strconv"
 	"sync"
 )
 
 // Envia las notebooks scrapeadas de Mercadolibre, Fravega y Fullh4rd
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
-
+	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Limite de productos a scrapear
 
 	scrapSettings := utils.Settings{
@@ -70,6 +71,13 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	// Se concatenan los resultados de los productos
 	allProducts := append(fullH4rdProducts, mercadolibreProducts...)
 	allProducts = append(allProducts, fravegaProducts...)
+
+	// Se ordenan los productos
+	if sort == "asc" {
+		slices.SortFunc(allProducts, utils.CmpProductAsc)
+	} else if sort == "desc" {
+		slices.SortFunc(allProducts, utils.CmpProductDesc)
+	}
 
 	// Se traen los productos hasta un limite
 	if limit > 0 && limit < len(allProducts) {
