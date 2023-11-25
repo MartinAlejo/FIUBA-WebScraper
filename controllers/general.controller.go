@@ -12,6 +12,8 @@ import (
 // Envia las notebooks scrapeadas de Mercadolibre, Fravega y Fullh4rd
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Limite de productos a scrapear
+
 	scrapSettings := utils.Settings{
 		Ram:       r.URL.Query().Get("ram"),
 		Inches:    r.URL.Query().Get("inches"),
@@ -20,8 +22,6 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		MinPrice:  r.URL.Query().Get("minPrice"),
 		MaxPrice:  r.URL.Query().Get("maxPrice"),
 	}
-
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Se recibe el limite de productos a scrapear
 
 	// Se usan canales para guardar los resultados al trabajar de forma concurrente
 	fullH4rdCh := make(chan []utils.Product)
@@ -67,22 +67,14 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	mercadolibreProducts := <-mercadolibreCh
 	fravegaProducts := <-fravegaCh
 
-	// Se traen los productos hasta un limite
-	if limit != 0 {
-		// TODO: Arreglar/cambiar (bugs y casos bordes)
-
-		// Calcular la cantidad deseada para cada fuente de productos
-		sourceLimit := limit / 3
-
-		// Limitar la cantidad de productos de cada fuente
-		fullH4rdProducts = utils.LimitProducts(fullH4rdProducts, sourceLimit)
-		mercadolibreProducts = utils.LimitProducts(mercadolibreProducts, sourceLimit)
-		fravegaProducts = utils.LimitProducts(fravegaProducts, sourceLimit)
-	}
-
 	// Se concatenan los resultados de los productos
 	allProducts := append(fullH4rdProducts, mercadolibreProducts...)
 	allProducts = append(allProducts, fravegaProducts...)
+
+	// Se traen los productos hasta un limite
+	if limit >= 0 && limit < len(allProducts) {
+		allProducts = allProducts[:limit]
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)

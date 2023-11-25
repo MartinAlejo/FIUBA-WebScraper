@@ -20,7 +20,7 @@ type Settings struct {
 	Processor string // Linea del procesador (intel, amd, apple)
 	MinPrice  string // Precio minimo (200000, por ejemplo)
 	MaxPrice  string // Precio maximo (2000000, por ejemplo)
-} //TODO: (Quiza) Agregar "rangos" para todos los parametros (minStorage, maxStorage, minRam, etc)
+} //TODO: Agregar "rangos" para todos los parametros (minStorage, maxStorage, minRam, minInches, etc)
 
 // Convierte un precio de formato string a un entero
 func ConvertPriceToNumber(price string) int {
@@ -69,12 +69,4 @@ func CmpProductDesc(a, b Product) int {
 	}
 
 	return 0
-}
-
-// A partir de un array de productos, devuelve hasta un limite del mismo
-func LimitProducts(products []Product, limit int) []Product {
-	if limit >= 0 && limit < len(products) {
-		return products[:limit]
-	}
-	return products
 }
