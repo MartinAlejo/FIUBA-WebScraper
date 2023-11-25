@@ -36,9 +36,10 @@ func ScrapFullH4rd(url string, scrapSettings utils.Settings) []utils.Product {
 		}
 
 		product := utils.Product{
-			Name:  e.ChildText("h3"),
-			Price: utils.ConvertPriceToNumber(price),
-			Url:   "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
+			Name:   e.ChildText("h3"),
+			Price:  utils.ConvertPriceToNumber(price),
+			Url:    "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
+			Origin: "FullH4rd",
 		}
 
 		if verifyProductFullH4rd(product.Name, &scrapSettings) {

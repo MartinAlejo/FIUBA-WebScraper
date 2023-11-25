@@ -15,9 +15,10 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
 		product := utils.Product{
-			Name:  e.ChildText(".ui-search-item__title"),
-			Price: utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction")),
-			Url:   e.ChildAttr("a", "href"),
+			Name:   e.ChildText(".ui-search-item__title"),
+			Price:  utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction")),
+			Url:    e.ChildAttr("a", "href"),
+			Origin: "Mercado Libre",
 		}
 
 		products = append(products, product)

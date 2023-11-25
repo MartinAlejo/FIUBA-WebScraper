@@ -7,10 +7,19 @@ import (
 
 // Struct utilizado para generar productos
 type Product struct {
-	Name  string `json:"name"`
-	Price int    `json:"price"`
-	Url   string `json:"url"`
-}
+	Name   string `json:"name"`
+	Price  int    `json:"price"`
+	Url    string `json:"url"`
+	Origin string `json:"origin"`
+} // TODO: Agregar un member "Specs", que sea otro struct que contenga la especificaciones del producto
+
+// Struct utilizado para almacenar las especificaciones de un producto
+// type Specs struct {
+// 	Processor string `json:"processor"`
+// 	Ram       string `json:"ram"`
+// 	Storage   string `json:"storage"`
+// 	Inches    string `json:"inches"`
+// }
 
 // Struct utilizado para almacenar la configuracion para scrapear
 type Settings struct {
@@ -20,7 +29,7 @@ type Settings struct {
 	Processor string // Linea del procesador (intel, amd, apple)
 	MinPrice  string // Precio minimo (200000, por ejemplo)
 	MaxPrice  string // Precio maximo (2000000, por ejemplo)
-} //TODO: Agregar "rangos" para todos los parametros (minStorage, maxStorage, minRam, minInches, etc)
+} // TODO: Agregar "rangos" para todos los parametros (minStorage, maxStorage, minRam, minInches, etc)
 
 // Convierte un precio de formato string a un entero
 func ConvertPriceToNumber(price string) int {
