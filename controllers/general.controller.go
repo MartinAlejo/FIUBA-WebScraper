@@ -72,36 +72,10 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	allProducts = append(allProducts, fravegaProducts...)
 
 	// Se traen los productos hasta un limite
-	if limit >= 0 && limit < len(allProducts) {
+	if limit > 0 && limit < len(allProducts) {
 		allProducts = allProducts[:limit]
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)
 }
-
-/* Version sin concurrencia
-TODO: Hacerla funcionar y comparar tiempos (para mostrarle al profesor la diferencia)
-
-func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
-
-	url := r.URL.String()
-	appendUrl := "http://localhost:8080"
-	prefixToRemove := "/api/general"
-	result := url[len(prefixToRemove):]
-
-	fullh4rdUrl := appendUrl + "/api/fullh4rd" + result
-	fraveaUrl := appendUrl + "/api/mercadolibre" + result
-	mercadolibreUrl := appendUrl + "/api/fravega" + result
-
-	fullH4rdProducts, _ := makeApiCall(fullh4rdUrl)
-	mercadolibreProducts, _ := makeApiCall(mercadolibreUrl)
-	fravegaProducts, _ := makeApiCall(fraveaUrl)
-
-	// Concatenate the slices
-	allProducts := append(fullH4rdProducts, mercadolibreProducts...)
-	allProducts = append(allProducts, fravegaProducts...)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(allProducts)
-} */
