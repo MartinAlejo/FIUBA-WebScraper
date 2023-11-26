@@ -11,17 +11,21 @@ type Product struct {
 	Price  int    `json:"price"`
 	Url    string `json:"url"`
 	Origin string `json:"origin"`
+	// Specs Specs `json:"specs"`
 } // TODO: Agregar un member "Specs", que sea otro struct que contenga la especificaciones del producto
 
 // Struct utilizado para almacenar las especificaciones de un producto
-// type Specs struct {
-// 	Processor string `json:"processor"`
-// 	Ram       string `json:"ram"`
-// 	Storage   string `json:"storage"`
-// 	Inches    string `json:"inches"`
-// }
+// TODO: Implementar para traer estos datos de todos los productos en la respuesta
+type Specs struct {
+	Processor string `json:"processor"`
+	Ram       string `json:"ram"`
+	Storage   string `json:"storage"`
+	Inches    string `json:"inches"`
+}
 
 // Struct utilizado para almacenar la configuracion para scrapear
+// IMPORTANTE: Esta deprecado, usar el struct de abajo (se deja hasta que se implemente con el nuevo struct
+// en todos los endpoints. Despues quitar)
 type Settings struct {
 	Ram       string // La memoria ram (4, 8, etc)
 	Inches    string // Las pulgadas de la pantalla (16, 17, etc)
@@ -29,7 +33,21 @@ type Settings struct {
 	Processor string // Linea del procesador (intel, amd, apple)
 	MinPrice  string // Precio minimo (200000, por ejemplo)
 	MaxPrice  string // Precio maximo (2000000, por ejemplo)
-} // TODO: Agregar "rangos" para todos los parametros (minStorage, maxStorage, minRam, minInches, etc)
+}
+
+// Struct utilizado para almacenar la configuracion para scrapear
+// TODO: Una vez implementado en todos los endpoints sacarle el prefix "New"
+type NewSettings struct {
+	MinRam     string // Cantidad de memoria ram
+	MaxRam     string
+	MinInches  string // Pulgadas de la pantalla
+	MaxInches  string
+	MinStorage string // Espacio en disco del ssd
+	MaxStorage string
+	MinPrice   string // Precio del equipo
+	MaxPrice   string
+	Processor  string // Linea del procesador (intel, amd, apple)
+}
 
 // Convierte un precio de formato string a un entero
 func ConvertPriceToNumber(price string) int {
