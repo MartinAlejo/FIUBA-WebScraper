@@ -54,15 +54,15 @@ func applyScrapSettingsMercadoLibre(url string, scrapSettings *utils.Settings) s
 
 	// Se aplican los settings para scrapear
 	if scrapSettings.Ram != "" {
-		url += fmt.Sprintf("/%s-GB", scrapSettings.Ram)
+		url += fmt.Sprintf("/mas-de-%s-GB", scrapSettings.Ram)
 	}
 
 	if scrapSettings.Storage != "" {
-		url += fmt.Sprintf("/%s-GB-capacidad-del-ssd", scrapSettings.Storage)
+		url += fmt.Sprintf("/mas-de-%s-GB-capacidad-del-ssd", scrapSettings.Storage)
 	}
 
 	if scrapSettings.Inches != "" {
-		url += fmt.Sprintf("/%s-pulgadas", scrapSettings.Inches)
+		url += fmt.Sprintf("/mas-de-%s-pulgadas", scrapSettings.Inches)
 	}
 
 	if scrapSettings.Processor != "" {
