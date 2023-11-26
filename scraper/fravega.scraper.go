@@ -43,15 +43,11 @@ func scrapFravegaPage(url string, products *[]utils.Product) *[]utils.Product {
 func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings, pageNumber string) string {
 
 	if scrapSettings.Storage != "" {
-		if scrapSettings.Storage == "1000" {
-			url += "+1TB"
-		} else {
-			url += fmt.Sprintf("+%sGB", scrapSettings.Storage)
-		}
+		url = apply_storage_settings(url, scrapSettings.Storage)
 	}
 
 	if scrapSettings.Ram != "" {
-		url += fmt.Sprintf("+%sGB", scrapSettings.Ram)
+		url = apply_ram_settings(url, scrapSettings.Ram)
 	}
 
 	if scrapSettings.Processor != "" {
@@ -76,6 +72,30 @@ func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings, pageNu
 
 	if pageNumber != "1" {
 		url += fmt.Sprintf("&page=%s", pageNumber)
+	}
+	return url
+}
+
+func apply_ram_settings(url string, ram string) string {
+	if ram <= "4" {
+		url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes"
+	} else if ram <= "8" {
+		url += "&memoria-ram=8-gigabytes%2C16-gigabytes%2C32-gigabytes"
+	} else {
+		url += "&memoria-ram=16-gigabytes%2C32-gigabytes"
+	}
+	return url
+}
+
+func apply_storage_settings(url string, storage string) string {
+	if storage == "1000" {
+		url += "%2Cmas-de-1-tb"
+	} else if storage <= "256" {
+		url += "&capacidad-de-disco=de-500-gb-a-1-tb%2Cmenos-500-gb%2Cmas-de-1-tb"
+	} else if storage <= "512" {
+		url += "&capacidad-de-disco=de-500-gb-a-1-tb%2Cmas-de-1-tb"
+	} else {
+		url += "&capacidad-de-disco=1-tb%2Cmas-de-1-tb%2Cde-500-gb-a-1-tb%2Cmenos-500-gb%2C240gb"
 	}
 	return url
 }
