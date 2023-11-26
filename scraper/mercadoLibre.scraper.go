@@ -11,6 +11,7 @@ import (
 func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
+	pagesScraped, pagesLimit := 0, 10 // Paginas scrapeadas / Limite de paginas a scrapear
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
@@ -24,13 +25,22 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 		products = append(products, product)
 	})
 
+	// Se scrapean multiples paginas
+	c.OnHTML("[title=Siguiente]", func(h *colly.HTMLElement) {
+		if pagesScraped < pagesLimit {
+			next_page := h.Attr("href")
+			pagesScraped += 1
+			c.Visit(next_page)
+		}
+	})
+
 	//TODO: Validaciones de input (query params)
 
 	// Se aplican los settings/filtros de scrapeo
 	visitUrl := applyScrapSettingsMercadoLibre(url, &scrapSettings)
 
 	// Se visita el sitio a scrapear y se devuelven los productos
-	//fmt.Println(visitUrl) //TODO: Quitar (test)
+	fmt.Println(visitUrl) //TODO: Quitar (test)
 
 	c.Visit(visitUrl)
 
