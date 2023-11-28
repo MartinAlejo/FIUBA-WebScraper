@@ -16,8 +16,10 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Se recibe el limite por query params (int)
 
-	if limit < constants.MinProductsToScrap {
-		limit = constants.MinProductsToScrap // Si el limite es menor o igual a 0, se setea el limite a 100 (limite por defecto)
+	if limit == 0 {
+		limit = constants.DefaultProductsToScrap // Si el limite es 0, se setea el limite a 100 (limite por defecto)
+	} else if limit < constants.MinProductsToScrap {
+		limit = constants.MinProductsToScrap // Si el limite es menor o igual a 0, se setea el limite a 30 (limite minimo)
 	} else if limit > constants.MaxProductsToScrap {
 		limit = constants.MaxProductsToScrap // Si el limite es mayor a 500, se setea el limite a 500 (limite maximo)
 	}
