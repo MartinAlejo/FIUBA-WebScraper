@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"go-scraper/constants"
 	"go-scraper/scraper"
 	"go-scraper/utils"
 	"net/http"
@@ -13,7 +14,13 @@ import (
 // Envia las notebooks scrapeadas de Mercadolibre, Fravega y Fullh4rd
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Limite de productos a scrapear
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Se recibe el limite por query params (int)
+
+	if limit < constants.MinProductsToScrap {
+		limit = constants.MinProductsToScrap // Si el limite es menor o igual a 0, se setea el limite a 100 (limite por defecto)
+	} else if limit > constants.MaxProductsToScrap {
+		limit = constants.MaxProductsToScrap // Si el limite es mayor a 500, se setea el limite a 500 (limite maximo)
+	}
 
 	scrapSettings := utils.Settings{
 		Ram:       r.URL.Query().Get("ram"),
