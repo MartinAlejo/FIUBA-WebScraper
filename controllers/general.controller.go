@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"go-scraper/constants"
 	"go-scraper/scraper"
 	"go-scraper/utils"
 	"net/http"
@@ -13,7 +14,8 @@ import (
 // Envia las notebooks scrapeadas de Mercadolibre, Fravega y Fullh4rd
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Limite de productos a scrapear
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Se recibe el limite por query params (int)
+	limit = getCorrectLimit(limit)
 
 	scrapSettings := utils.Settings{
 		Ram:       r.URL.Query().Get("ram"),
@@ -22,6 +24,11 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		Processor: r.URL.Query().Get("processor"),
 		MinPrice:  r.URL.Query().Get("minPrice"),
 		MaxPrice:  r.URL.Query().Get("maxPrice"),
+	}
+
+	// Se chequea que los parametros sean validos
+	if !checkSettingsValidity(scrapSettings, w) {
+		return
 	}
 
 	// Se usan canales para guardar los resultados al trabajar de forma concurrente
@@ -86,4 +93,56 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)
+}
+
+func checkSettingsValidity(scrapSettings utils.Settings, w http.ResponseWriter) bool {
+	if scrapSettings.Ram != "" {
+		if _, err := strconv.Atoi(scrapSettings.Ram); err != nil {
+			return respondWithError(w, "ram must be a number", http.StatusBadRequest)
+		}
+	}
+	if scrapSettings.Inches != "" {
+		if _, err := strconv.Atoi(scrapSettings.Inches); err != nil {
+			return respondWithError(w, "inches must be a number", http.StatusBadRequest)
+		}
+	}
+	if scrapSettings.Storage != "" {
+		if _, err := strconv.Atoi(scrapSettings.Storage); err != nil {
+			return respondWithError(w, "storage must be a number", http.StatusBadRequest)
+		}
+	}
+	if scrapSettings.MinPrice != "" {
+		if _, err := strconv.Atoi(scrapSettings.MinPrice); err != nil {
+			return respondWithError(w, "minPrice must be a number", http.StatusBadRequest)
+		}
+	}
+	if scrapSettings.MaxPrice != "" {
+		if _, err := strconv.Atoi(scrapSettings.MaxPrice); err != nil {
+			return respondWithError(w, "maxPrice must be a number", http.StatusBadRequest)
+		}
+	}
+	return true
+}
+
+func respondWithError(w http.ResponseWriter, message string, statusCode int) bool {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+
+	if err := json.NewEncoder(w).Encode(map[string]string{"error": message}); err != nil {
+		return false
+	}
+
+	return false
+}
+
+// Devovler limit correcto
+func getCorrectLimit(limit int) int {
+	if limit == 0 {
+		return constants.DefaultProductsToScrap
+	} else if limit < constants.MinProductsToScrap {
+		return constants.MinProductsToScrap
+	} else if limit > constants.MaxProductsToScrap {
+		return constants.MaxProductsToScrap
+	}
+	return limit
 }
