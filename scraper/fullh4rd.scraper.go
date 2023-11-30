@@ -3,6 +3,7 @@ package scraper
 import (
 	"fmt"
 	"go-scraper/utils"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -35,11 +36,15 @@ func ScrapFullH4rd(url string, scrapSettings utils.Settings) []utils.Product {
 			price = elements[0]
 		}
 
+		productName := e.ChildText("h3")
+		specs := parseSpecs(productName)
+
 		product := utils.Product{
-			Name:   e.ChildText("h3"),
+			Name:   productName,
 			Price:  utils.ConvertPriceToNumber(price),
 			Url:    "https://www.fullh4rd.com.ar/" + e.ChildAttr("a", "href"),
 			Origin: "FullH4rd",
+			Specs:  specs,
 		}
 
 		if verifyProductFullH4rd(product.Name, &scrapSettings) {
@@ -157,5 +162,105 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
 	} else {
 		return false
 	}
+}
 
+func parseSpecs(input string) utils.Specs {
+	var specs utils.Specs
+
+	// Extract RAM and Storage using regular expressions
+	ramRegex := regexp.MustCompile(`(\d+)GB`)
+	storageRegex := regexp.MustCompile(`(\d+)(GB|TB|G)`)
+
+	ramMatches := ramRegex.FindAllStringSubmatch(input, -1)
+	storageMatches := storageRegex.FindAllStringSubmatch(input, -1)
+
+	// Find the largest RAM value
+	maxRam := 0
+	for _, match := range ramMatches {
+		ram, err := strconv.Atoi(match[1])
+		if err == nil && ram > maxRam {
+			maxRam = ram
+		}
+	}
+
+	// Assign RAM based on the largest value
+	for _, match := range ramMatches {
+		ram, _ := strconv.Atoi(match[1])
+		if ram == maxRam {
+			specs.Ram = match[0]
+		}
+	}
+
+	// Assign Storage based on the remaining matches
+	for _, match := range storageMatches {
+		if specs.Ram == "" || match[0] != specs.Ram {
+			specs.Storage = match[0]
+		}
+	}
+
+	if !strings.Contains(specs.Storage, "TB") {
+		// Swap values of Ram and Storage
+		specs.Ram, specs.Storage = specs.Storage, specs.Ram
+	}
+
+	// Check if Ram has the structure "number + 'G'"
+	if strings.HasSuffix(specs.Ram, "G") {
+		// Swap values of Ram and Storage
+		specs.Ram, specs.Storage = specs.Storage, specs.Ram
+	}
+
+	// Define a regular expression pattern to match the display size (integer or decimal)
+	displayPattern := regexp.MustCompile(`(\d+(\.\d+)?)\"`)
+
+	// Find the match in the string
+	match := displayPattern.FindStringSubmatch(input)
+
+	// Extract the display size from the match
+	if len(match) > 1 {
+		specs.Inches = match[1]
+	}
+
+	if strings.Contains(input, "RYZEN") {
+
+		substrings := strings.Fields(input)
+		// Result string
+		result := "RYZEN"
+
+		// Flag to indicate whether to include the substring in the result
+		include := false
+
+		// Iterate through the substrings
+		for _, substring := range substrings {
+			// Check if the substring contains "GB"
+			if strings.Contains(substring, "GB") {
+				break
+			}
+
+			// Check if the substring contains "RYZEN"
+			if include {
+				result += " " + substring
+			}
+
+			if strings.Contains(substring, "RYZEN") {
+				include = true
+			}
+		}
+
+		// Trim leading space from the result
+		result = strings.TrimSpace(result)
+
+		specs.Processor = result
+
+	} else {
+		result := ""
+		re := regexp.MustCompile(`(?:I[0-9]+-[0-9A-Za-z]+)|(?:I[0-9]+\s[0-9A-Za-z]+)`)
+
+		// Find the match in the input string
+		match := re.FindString(input)
+
+		result = match
+		specs.Processor = result
+	}
+
+	return specs
 }
