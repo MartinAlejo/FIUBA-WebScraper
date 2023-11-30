@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"go-scraper/constants"
 	"go-scraper/scraper"
 	"go-scraper/utils"
 	"go-scraper/validations"
@@ -16,7 +15,7 @@ import (
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Se recibe el limite por query params (int)
-	limit = getCorrectLimit(limit)
+	limit = utils.GetCorrectLimit(limit)
 
 	scrapSettings := utils.Settings{
 		Ram:       r.URL.Query().Get("ram"),
@@ -94,13 +93,4 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)
-}
-
-// Devovler limit correcto
-func getCorrectLimit(limit int) int {
-	if limit == 0 || limit > constants.MaxProductsToScrap {
-		return constants.MaxProductsToScrap
-	}
-
-	return limit
 }

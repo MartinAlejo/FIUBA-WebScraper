@@ -13,7 +13,7 @@ func ScrapFravega(url string, scrapSettings utils.Settings) []utils.Product {
 
 	var products []utils.Product
 	// scrap products from page 1 to 10
-	for i := 1; i <= constants.MaxPagesToScap; i++ {
+	for i := 1; i <= constants.MaxPagesToScrap; i++ {
 		products = *scrapFravegaPage(applyScrapSettingsFravega(url, &scrapSettings, fmt.Sprintf("%d", i)), &products)
 	}
 

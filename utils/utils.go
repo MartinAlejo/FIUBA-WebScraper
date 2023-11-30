@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"go-scraper/constants"
 	"net/http"
 	"strconv"
 	"strings"
@@ -94,4 +95,13 @@ func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) bo
 	}
 
 	return false
+}
+
+// Devuelve el limite correcto
+func GetCorrectLimit(limit int) int {
+	if limit == 0 || limit > constants.MaxProductsToScrap {
+		return constants.MaxProductsToScrap
+	}
+
+	return limit
 }

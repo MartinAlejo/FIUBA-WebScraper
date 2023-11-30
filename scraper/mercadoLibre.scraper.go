@@ -12,7 +12,7 @@ import (
 func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product {
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 	var products []utils.Product
-	pagesScraped, pagesLimit := 0, constants.MaxPagesToScap // Paginas scrapeadas / Limite de paginas a scrapear
+	pagesScraped, pagesLimit := 0, constants.MaxPagesToScrap // Paginas scrapeadas / Limite de paginas a scrapear
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
