@@ -47,7 +47,7 @@ func ScrapFullH4rd(url string, scrapSettings utils.Settings) []utils.Product {
 			Specs:  specs,
 		}
 
-		if verifyProductFullH4rd(product.Name, &scrapSettings) {
+		if verifyProductFullH4rd(product.Name, &scrapSettings) && len(specs.Processor) > 7 {
 
 			if maxPrice > 0 || minPrice > 0 {
 				if maxPrice != 0 && minPrice == 0 {
@@ -104,7 +104,13 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 	}
 
 	if scrapSettings.Processor != "" {
-		url += fmt.Sprintf("%s%s", appendStr, scrapSettings.Processor)
+
+		if scrapSettings.Processor == "amd" {
+			url += fmt.Sprintf("%s%s", appendStr, "ryzen")
+		} else if scrapSettings.Processor == "apple" {
+			url += fmt.Sprintf("%s%s", appendStr, "apple")
+		}
+
 	}
 
 	if scrapSettings.MinPrice != "" || scrapSettings.MaxPrice != "" {
@@ -128,12 +134,23 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
 
 	lowerName := strings.ToLower(name)
 
-	if strings.Contains(lowerName, "notebook") || strings.Contains(lowerName, "laptop") {
+	if (strings.Contains(lowerName, "notebook") || strings.Contains(lowerName, "laptop")) &&
+		!(strings.Contains(lowerName, "cooler")) {
 
+		// intel, amd o apple
 		if !(scrapSettings.Processor == "") {
-			if !strings.Contains(lowerName, scrapSettings.Processor) {
-				return false
+
+			if scrapSettings.Processor == "amd" {
+
+				return strings.Contains(lowerName, "ryzen")
+			} else if scrapSettings.Processor == "apple" {
+
+				return strings.Contains(lowerName, "apple")
+			} else if scrapSettings.Processor == "intel" {
+
+				return !strings.Contains(lowerName, "apple") && !strings.Contains(lowerName, "amd") && !strings.Contains(lowerName, "ryzen")
 			}
+
 		}
 
 		if !(scrapSettings.Ram == "") {
@@ -261,6 +278,5 @@ func parseSpecs(input string) utils.Specs {
 		result = match
 		specs.Processor = result
 	}
-
 	return specs
 }
