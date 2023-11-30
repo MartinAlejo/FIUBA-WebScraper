@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -80,4 +82,16 @@ func CmpProductDesc(a, b Product) int {
 	}
 
 	return 0
+}
+
+// Envia una respuesta de error
+func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) bool {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+
+	if err := json.NewEncoder(w).Encode(map[string]string{"error": message}); err != nil {
+		return false
+	}
+
+	return false
 }
