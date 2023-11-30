@@ -71,7 +71,7 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		close(fravegaCh)
 	}()
 
-	// Se obtienen los resultados que obtuvimos en los canales
+	// Traemos los productos de los canales
 	fullH4rdProducts := <-fullH4rdCh
 	mercadolibreProducts := <-mercadolibreCh
 	fravegaProducts := <-fravegaCh
@@ -98,12 +98,9 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 // Devovler limit correcto
 func getCorrectLimit(limit int) int {
-	if limit == 0 {
-		return constants.DefaultProductsToScrap
-	} else if limit < constants.MinProductsToScrap {
-		return constants.MinProductsToScrap
-	} else if limit > constants.MaxProductsToScrap {
+	if limit == 0 || limit > constants.MaxProductsToScrap {
 		return constants.MaxProductsToScrap
 	}
+
 	return limit
 }
