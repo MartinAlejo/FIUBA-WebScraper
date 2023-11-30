@@ -26,7 +26,7 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		MaxPrice:  r.URL.Query().Get("maxPrice"),
 	}
 
-	// Se chequea que los parametros sean validos
+	// Se validan los settings
 	if !validations.ValidateSettings(scrapSettings, w) {
 		return
 	}

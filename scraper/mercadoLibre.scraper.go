@@ -41,7 +41,7 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 	visitUrl := applyScrapSettingsMercadoLibre(url, &scrapSettings)
 
 	// Se visita el sitio a scrapear y se devuelven los productos
-	fmt.Println(visitUrl) //TODO: Quitar (test)
+	// fmt.Println(visitUrl) //TODO: Quitar (test)
 
 	c.Visit(visitUrl)
 
