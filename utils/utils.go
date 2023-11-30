@@ -99,7 +99,7 @@ func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) bo
 
 // Devuelve el limite correcto
 func GetCorrectLimit(limit int) int {
-	if limit == 0 || limit > constants.MaxProductsToScrap {
+	if limit <= 0 || limit > constants.MaxProductsToScrap {
 		return constants.MaxProductsToScrap
 	}
 
