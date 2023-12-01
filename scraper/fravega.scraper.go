@@ -132,11 +132,6 @@ func extractInches(input string, specs *utils.Specs) {
 			}
 		}
 	}
-
-	// Establecer un valor predeterminado si no se encontraron pulgadas válidas
-	if specs.Inches == "" {
-		specs.Inches = "15"
-	}
 }
 
 func extractProcessor(input string, specs *utils.Specs) {
@@ -294,9 +289,5 @@ func extractRamAndStorage(input string, specs *utils.Specs) {
 				specs.Storage = foundStorage
 			}
 		}
-		if specs.Storage == "" {
-			specs.Storage = "512GB"
-		}
 	}
-
 }
