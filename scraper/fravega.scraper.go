@@ -110,26 +110,51 @@ func parseSpecs(input string) utils.Specs {
 
 	extractRamAndStorage(input, &specs)
 	extractProcessor(input, &specs)
-
-	// Define a regular expression pattern to match the display size (integer or decimal)
-	displayPattern := regexp.MustCompile(`(\d+(\.\d+)?)\"`)
-
-	// Find the match in the string
-	match := displayPattern.FindStringSubmatch(input)
-
-	// Extract the display size from the match
-	if len(match) > 1 {
-		specs.Inches = match[1]
-	} else {
-		re := regexp.MustCompile(`(\d+)”`)
-		match := re.FindStringSubmatch(input)
-		if len(match) > 1 {
-			specs.Inches = match[1]
-		}
-
-	}
+	extractInches(input, &specs)
 
 	return specs
+}
+
+func extractInches(input string, specs *utils.Specs) {
+	// Define a regular expression pattern to match the display size (integer or decimal)
+	//inchesRegex := regexp.MustCompile(`(\d+(\.\d+)?)\s*("|inch|inches)?`)
+	inchesRegex := regexp.MustCompile(`(\d+(\.\d+)?)\\?"?`)
+	// Find the match in the string
+	match := inchesRegex.FindStringSubmatch(input)
+
+	// Extract the display size from the match
+	if len(match) >= 1 {
+		// Convert the string to a float
+		inches, _ := strconv.ParseFloat(match[1], 64)
+		if inches >= 10 && inches <= 20 {
+			specs.Inches = match[1]
+		}
+	}
+	if specs.Inches == "" {
+		inchesRegex2 := regexp.MustCompile(`(\d+)\\`)
+		match2 := inchesRegex2.FindStringSubmatch(input)
+		if len(match2) >= 1 {
+			// Convert the string to a float
+			inches, _ := strconv.ParseFloat(match2[1], 64)
+			if inches >= 10 && inches <= 20 {
+				specs.Inches = match2[1]
+			}
+		}
+	}
+	if specs.Inches == "" {
+		inchesRegex3 := regexp.MustCompile(`(\d+(?:,\d+)?)`)
+		match3 := inchesRegex3.FindStringSubmatch(input)
+		if len(match3) >= 1 {
+			// Convert the string to a float
+			inches, _ := strconv.ParseFloat(match3[1], 64)
+			if inches >= 10 && inches <= 20 {
+				specs.Inches = match3[1]
+			}
+		}
+	}
+	if specs.Inches == "" {
+		specs.Inches = "15"
+	}
 }
 
 func extractProcessor(input string, specs *utils.Specs) {
