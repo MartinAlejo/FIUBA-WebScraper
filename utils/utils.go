@@ -28,12 +28,14 @@ type Specs struct {
 
 // Struct utilizado para almacenar la configuracion para scrapear
 type Settings struct {
-	Ram       string // La memoria ram a partir de la que se busca (4, 8, etc)
-	Inches    string // Las pulgadas a partir de las que se busca (16, 17, etc)
-	Storage   string // Espacio en disco a partir del que se busca (256, 512, etc)
-	Processor string // Linea del procesador (intel, amd, apple)
-	MinPrice  string // Precio minimo (200000, por ejemplo)
-	MaxPrice  string // Precio maximo (2000000, por ejemplo)
+	MinRam     string // La memoria ram a partir de la que se busca (4, 8, etc)
+	MaxRam     string // La memoria ram hasta la que se busca (4, 8, etc)
+	Inches     string // Las pulgadas a partir de las que se busca (16, 17, etc)
+	MinStorage string // Espacio en disco a partir del que se busca (256, 512, etc)
+	MaxStorage string // Espacio en disco hasta el que se busca (256, 512, etc)
+	Processor  string // Linea del procesador (intel, amd, apple)
+	MinPrice   string // Precio minimo (200000, por ejemplo)
+	MaxPrice   string // Precio maximo (2000000, por ejemplo)
 }
 
 // Convierte un precio de formato string a un entero

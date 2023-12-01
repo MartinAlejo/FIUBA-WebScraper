@@ -17,8 +17,13 @@ func ValidateSettings(scrapSettings utils.Settings, w http.ResponseWriter) bool 
 			return utils.SendErrorResponse(w, errMessage, http.StatusBadRequest)
 		}
 	}
-	if scrapSettings.Ram != "" {
-		if _, err := strconv.Atoi(scrapSettings.Ram); err != nil {
+	if scrapSettings.MinRam != "" {
+		if _, err := strconv.Atoi(scrapSettings.MinRam); err != nil {
+			return utils.SendErrorResponse(w, "ram must be a number", http.StatusBadRequest)
+		}
+	}
+	if scrapSettings.MaxRam != "" {
+		if _, err := strconv.Atoi(scrapSettings.MaxRam); err != nil {
 			return utils.SendErrorResponse(w, "ram must be a number", http.StatusBadRequest)
 		}
 	}
@@ -27,8 +32,13 @@ func ValidateSettings(scrapSettings utils.Settings, w http.ResponseWriter) bool 
 			return utils.SendErrorResponse(w, "inches must be a number", http.StatusBadRequest)
 		}
 	}
-	if scrapSettings.Storage != "" {
-		if _, err := strconv.Atoi(scrapSettings.Storage); err != nil {
+	if scrapSettings.MinStorage != "" {
+		if _, err := strconv.Atoi(scrapSettings.MinStorage); err != nil {
+			return utils.SendErrorResponse(w, "storage must be a number", http.StatusBadRequest)
+		}
+	}
+	if scrapSettings.MaxStorage != "" {
+		if _, err := strconv.Atoi(scrapSettings.MaxStorage); err != nil {
 			return utils.SendErrorResponse(w, "storage must be a number", http.StatusBadRequest)
 		}
 	}
