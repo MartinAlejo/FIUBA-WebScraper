@@ -116,42 +116,25 @@ func parseSpecs(input string) utils.Specs {
 }
 
 func extractInches(input string, specs *utils.Specs) {
-	// Define a regular expression pattern to match the display size (integer or decimal)
-	//inchesRegex := regexp.MustCompile(`(\d+(\.\d+)?)\s*("|inch|inches)?`)
-	inchesRegex := regexp.MustCompile(`(\d+(\.\d+)?)\\?"?`)
-	// Find the match in the string
-	match := inchesRegex.FindStringSubmatch(input)
+	// Expresión regular para capturar pulgadas con o sin decimales seguido opcionalmente por comillas o barra invertida
+	inchesRegex := regexp.MustCompile(`(\d+(?:,\d+)?(?:\.\d+)?)\\?"?`)
 
-	// Extract the display size from the match
-	if len(match) >= 1 {
-		// Convert the string to a float
-		inches, _ := strconv.ParseFloat(match[1], 64)
-		if inches >= 10 && inches <= 20 {
-			specs.Inches = match[1]
-		}
-	}
-	if specs.Inches == "" {
-		inchesRegex2 := regexp.MustCompile(`(\d+)\\`)
-		match2 := inchesRegex2.FindStringSubmatch(input)
-		if len(match2) >= 1 {
-			// Convert the string to a float
-			inches, _ := strconv.ParseFloat(match2[1], 64)
-			if inches >= 10 && inches <= 20 {
-				specs.Inches = match2[1]
+	// Buscar todas las coincidencias en la cadena
+	matches := inchesRegex.FindAllStringSubmatch(input, -1)
+
+	// Iterar sobre las coincidencias
+	for _, match := range matches {
+		// Verificar si se encontró un valor válido y está en el rango deseado
+		if len(match) >= 2 {
+			inches, err := strconv.ParseFloat(match[1], 64)
+			if err == nil && inches >= 10 && inches <= 20 {
+				specs.Inches = match[1]
+				break // Salir del bucle si se encuentra una coincidencia válida
 			}
 		}
 	}
-	if specs.Inches == "" {
-		inchesRegex3 := regexp.MustCompile(`(\d+(?:,\d+)?)`)
-		match3 := inchesRegex3.FindStringSubmatch(input)
-		if len(match3) >= 1 {
-			// Convert the string to a float
-			inches, _ := strconv.ParseFloat(match3[1], 64)
-			if inches >= 10 && inches <= 20 {
-				specs.Inches = match3[1]
-			}
-		}
-	}
+
+	// Establecer un valor predeterminado si no se encontraron pulgadas válidas
 	if specs.Inches == "" {
 		specs.Inches = "15"
 	}
