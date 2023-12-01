@@ -109,6 +109,7 @@ func parseSpecs(input string) utils.Specs {
 	var specs utils.Specs
 
 	extractRamAndStorage(input, &specs)
+	extractProcessor(input, &specs)
 
 	// Define a regular expression pattern to match the display size (integer or decimal)
 	displayPattern := regexp.MustCompile(`(\d+(\.\d+)?)\"`)
@@ -128,6 +129,10 @@ func parseSpecs(input string) utils.Specs {
 
 	}
 
+	return specs
+}
+
+func extractProcessor(input string, specs *utils.Specs) {
 	if strings.Contains(input, "RYZEN") {
 
 		substrings := strings.Fields(input)
@@ -159,6 +164,35 @@ func parseSpecs(input string) utils.Specs {
 
 		specs.Processor = result
 
+	} else if strings.Contains(input, "INTEL") {
+		substrings := strings.Fields(input)
+		// Result string
+		result := "INTEL"
+
+		// Flag to indicate whether to include the substring in the result
+		include := false
+
+		// Iterate through the substrings
+		for _, substring := range substrings {
+			// Check if the substring contains "GB", "TB" or "SSD"
+			if strings.Contains(substring, "GB") || strings.Contains(substring, "TB") || strings.Contains(substring, "SSD") {
+				break
+			}
+
+			// Check if the substring contains "INTEL"
+			if include {
+				result += " " + substring
+			}
+
+			if strings.Contains(substring, "INTEL") {
+				include = true
+			}
+		}
+
+		// Trim leading space from the result
+		result = strings.TrimSpace(result)
+
+		specs.Processor = result
 	} else {
 		result := ""
 		re := regexp.MustCompile(`(?:I[0-9]+-[0-9A-Za-z]+)|(?:I[0-9]+\s[0-9A-Za-z]+)`)
@@ -167,9 +201,12 @@ func parseSpecs(input string) utils.Specs {
 		match := re.FindString(input)
 
 		result = match
-		specs.Processor = result
+		// if result tiene "GB" eliminarlo del string
+		if strings.Contains(result, "GB") {
+			result = strings.Replace(result, "GB", "", -1)
+		}
+		specs.Processor = "INTEL " + result
 	}
-	return specs
 }
 
 func extractRamAndStorage(input string, specs *utils.Specs) {
