@@ -14,7 +14,7 @@ type Product struct {
 	Price  int    `json:"price"`
 	Url    string `json:"url"`
 	Origin string `json:"origin"`
-	// Specs Specs `json:"specs"`
+	//Specs  Specs  `json:"specs"`
 } // TODO: Agregar un member "Specs", que sea otro struct que contenga la especificaciones del producto
 
 // Struct utilizado para almacenar las especificaciones de un producto
