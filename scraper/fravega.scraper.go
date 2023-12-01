@@ -117,8 +117,7 @@ func parseSpecs(input string) utils.Specs {
 
 func extractInches(input string, specs *utils.Specs) {
 	// Expresión regular para capturar pulgadas con o sin decimales seguido opcionalmente por comillas o barra invertida
-	inchesRegex := regexp.MustCompile(`(\d+(?:,\d+)?(?:\.\d+)?)\\?"?`)
-
+	inchesRegex := regexp.MustCompile(`(\d+(?:,\d+)?(?:\.\d+)?)\\?"?“?`)
 	// Buscar todas las coincidencias en la cadena
 	matches := inchesRegex.FindAllStringSubmatch(input, -1)
 
