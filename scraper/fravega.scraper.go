@@ -273,4 +273,30 @@ func extractRamAndStorage(input string, specs *utils.Specs) {
 		specs.Storage = strconv.Itoa(ssdMax) + "GB"
 	}
 
+	if specs.Ram == "" {
+		// Buscar por el string: 16GB, 8GB, 4GB, 32GB
+		re := regexp.MustCompile(`(\d+\s*GB)`)
+		match := re.FindStringSubmatch(input)
+
+		if len(match) > 0 {
+			specs.Ram = match[0]
+		}
+	}
+
+	if specs.Storage == "" || strings.EqualFold(specs.Storage, specs.Ram) {
+		// Buscar por el string: 512GB, 1TB, 2TB, 256GB, 128GB, 64GB, 512, SSD 512
+		re := regexp.MustCompile(`(SSD\s*\d+)|((\d+)\s*SSD)|((\d+)\s*TB)`)
+		match := re.FindStringSubmatch(input)
+
+		if len(match) > 0 {
+			foundStorage := match[1] // Utilizar la primera coincidencia
+			if !strings.EqualFold(foundStorage, specs.Ram) {
+				specs.Storage = foundStorage
+			}
+		}
+		if specs.Storage == "" {
+			specs.Storage = "512GB"
+		}
+	}
+
 }
