@@ -31,11 +31,11 @@ func scrapFravegaPage(url string, products *[]utils.Product) *[]utils.Product {
 	c.OnHTML("article[data-test-id='result-item']", func(e *colly.HTMLElement) {
 		name := e.ChildText("span[class='sc-6321a7c8-0 jKvHol']")
 		product := utils.Product{
-			Name:   strings.ToUpper(name),
+			Name:   name,
 			Price:  utils.ConvertPriceToNumber(e.ChildText("span.sc-ad64037f-0.ixxpWu")),
 			Url:    "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 			Origin: "Fravega",
-			Specs:  parseSpecs(strings.ToUpper(name)),
+			//Specs:  parseSpecs(strings.ToUpper(name)),
 		}
 
 		*products = append(*products, product)
