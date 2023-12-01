@@ -176,7 +176,7 @@ func extractRamAndStorage(input string, specs *utils.Specs) {
 	// Extract RAM and Storage using regular expressions
 	ramRegex := regexp.MustCompile(`(\d+)GB`)
 	storageRegex := regexp.MustCompile(`(\d+)(GB|TB)`)
-	ssdRegex := regexp.MustCompile(`SSD\s*(\d+)`)
+	ssdRegex := regexp.MustCompile(`SSD\s*(\d+)|(\d+)\s*SSD`)
 
 	ramMatches := ramRegex.FindAllStringSubmatch(input, -1)
 	storageMatches := storageRegex.FindAllStringSubmatch(input, -1)
@@ -226,7 +226,7 @@ func extractRamAndStorage(input string, specs *utils.Specs) {
 		}
 	}
 	if ssdMax != 0 && specs.Storage == "" {
-		specs.Storage = strconv.Itoa(ssdMax) + "GBb"
+		specs.Storage = strconv.Itoa(ssdMax) + "GB"
 	}
 
 }
