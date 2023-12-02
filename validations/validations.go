@@ -64,3 +64,17 @@ func ValidateLimit(limit string, w http.ResponseWriter) bool {
 
 	return true
 }
+
+// Valida que el sort sea correcto
+func ValidateSort(sort string, w http.ResponseWriter) bool {
+	if sort == "" {
+		return true
+	}
+
+	if slices.Contains(constants.Sorting, sort) {
+		return true
+	}
+
+	errMessage := "sort must be either: " + strings.Join(constants.Sorting, ", ")
+	return utils.SendErrorResponse(w, errMessage, http.StatusBadRequest)
+}

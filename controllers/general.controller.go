@@ -29,6 +29,10 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !validations.ValidateSort(sort, w) {
+		return
+	}
+
 	if !validations.ValidateLimit(limit, w) {
 		return
 	}
