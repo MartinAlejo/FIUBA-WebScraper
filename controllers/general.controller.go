@@ -7,20 +7,19 @@ import (
 	"go-scraper/validations"
 	"net/http"
 	"slices"
-	"strconv"
 	"sync"
 )
 
 // Envia las notebooks scrapeadas de Mercadolibre, Fravega y Fullh4rd
 func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
-	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Se recibe el limite por query params (int)
-	limit = utils.GetCorrectLimit(limit)
+	sort := r.URL.Query().Get("sort")   // Se recibe el sort por query params ("asc", "desc", "")
+	limit := r.URL.Query().Get("limit") // Se recibe el limite por query params
 
 	scrapSettings := utils.Settings{
 		MinRam:     r.URL.Query().Get("minRam"),
 		MaxRam:     r.URL.Query().Get("maxRam"),
-		Inches:     r.URL.Query().Get("inches"),
+		MaxInches:  r.URL.Query().Get("maxInches"),
+		MinInches:  r.URL.Query().Get("minInches"),
 		MinStorage: r.URL.Query().Get("minStorage"),
 		MaxStorage: r.URL.Query().Get("maxStorage"),
 		Processor:  r.URL.Query().Get("processor"),
@@ -28,10 +27,21 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		MaxPrice:   r.URL.Query().Get("maxPrice"),
 	}
 
-	// Se validan los settings
+	// Se hacen las validaciones (si no se cumplen se envia un error)
 	if !validations.ValidateSettings(scrapSettings, w) {
 		return
 	}
+
+	if !validations.ValidateSort(sort, w) {
+		return
+	}
+
+	if !validations.ValidateLimit(limit, w) {
+		return
+	}
+
+	// Si llego hasta aca, ya se valido todo correctamente
+	limitNum := utils.GetCorrectLimit(limit)
 
 	// Se usan canales para guardar los resultados al trabajar de forma concurrente
 	fullH4rdCh := make(chan []utils.Product)
@@ -89,9 +99,7 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Se traen los productos hasta un limite
-	if limit > 0 && limit < len(allProducts) {
-		allProducts = allProducts[:limit]
-	}
+	allProducts = utils.LimitProducts(limitNum, allProducts)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(allProducts)
