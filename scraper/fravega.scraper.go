@@ -17,13 +17,13 @@ func ScrapFravega(url string, scrapSettings utils.Settings) []utils.Product {
 	var products []utils.Product
 	// scrap products from page 1 to 10
 	for i := 1; i <= constants.MaxPagesToScrap; i++ {
-		products = *scrapFravegaPage(applyScrapSettingsFravega(url, &scrapSettings, fmt.Sprintf("%d", i)), &products)
+		products = *scrapFravegaPage(applyScrapSettingsFravega(url, &scrapSettings, fmt.Sprintf("%d", i)), &products, scrapSettings)
 	}
 
 	return products
 }
 
-func scrapFravegaPage(url string, products *[]utils.Product) *[]utils.Product {
+func scrapFravegaPage(url string, products *[]utils.Product, scrapSettings utils.Settings) *[]utils.Product {
 
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 
@@ -35,32 +35,72 @@ func scrapFravegaPage(url string, products *[]utils.Product) *[]utils.Product {
 			Price:  utils.ConvertPriceToNumber(e.ChildText("span.sc-ad64037f-0.ixxpWu")),
 			Url:    "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 			Origin: "Fravega",
-			//Specs:  parseSpecs(strings.ToUpper(name)),
+			Specs:  parseSpecs(strings.ToUpper(name)),
 		}
-
-		*products = append(*products, product)
+		if validateFravegaProduct(&product.Specs, &scrapSettings) {
+			*products = append(*products, product)
+		}
 	})
-
+	println(url)
 	c.Visit(url) // Se visita el sitio a scrapear
 	return products
 }
 
+// necesito verificar con los Specs si es un producto valido
+func validateFravegaProduct(specs *utils.Specs, scrapSettings *utils.Settings) bool {
+
+	// restrictions
+	minStorage, _ := strconv.Atoi(scrapSettings.MinStorage)
+	maxStorage, _ := strconv.Atoi(scrapSettings.MaxStorage)
+	minRam, _ := strconv.Atoi(scrapSettings.MinRam)
+	maxRam, _ := strconv.Atoi(scrapSettings.MaxRam)
+	minInches, _ := strconv.Atoi(scrapSettings.MinInches)
+	maxInches, _ := strconv.Atoi(scrapSettings.MaxInches)
+	processor := scrapSettings.Processor
+
+	// specs
+	storage, _ := strconv.Atoi(strings.Replace(specs.Storage, "GB", "", -1))
+	ram, _ := strconv.Atoi(strings.Replace(specs.Ram, "GB", "", -1))
+	inches, _ := strconv.ParseFloat(strings.Replace(specs.Inches, ",", ".", -1), 64)
+	processorSpecs := specs.Processor
+
+	if storage == 0 || ram == 0 || inches == 0 || processorSpecs == "" {
+		return false
+	}
+
+	if minStorage != 0 && storage < minStorage {
+		return false
+	} else if maxStorage != 0 && storage > maxStorage {
+		return false
+	}
+	if minRam != 0 && ram < minRam {
+		return false
+	} else if maxRam != 0 && ram > maxRam {
+		return false
+	}
+	if minInches != 0 && float64(minInches) > inches {
+		return false
+	} else if maxInches != 0 && inches > float64(maxInches) {
+		return false
+	}
+	if processor != "" && !strings.Contains(strings.ToUpper(processorSpecs), strings.ToUpper(processor)) {
+		return false
+	}
+	return true
+}
+
 func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings, pageNumber string) string {
-
-	if scrapSettings.Storage != "" {
-		url = apply_storage_settings(url, scrapSettings.Storage)
-	}
-
-	if scrapSettings.Ram != "" {
-		url = apply_ram_settings(url, scrapSettings.Ram)
-	}
 
 	if scrapSettings.Processor != "" {
 		url += fmt.Sprintf("+%s", scrapSettings.Processor)
 	}
 
-	if scrapSettings.Inches != "" {
-		url += fmt.Sprintf("&tamano-de-pantalla=%s-pulgadas", scrapSettings.Inches)
+	if scrapSettings.MinStorage != "" || scrapSettings.MaxStorage != "" {
+		url = apply_storage_settings(url, scrapSettings.MinStorage, scrapSettings.MaxStorage)
+	}
+
+	if scrapSettings.MinRam != "" || scrapSettings.MaxRam != "" {
+		url = apply_ram_settings(url, scrapSettings.MinRam, scrapSettings.MaxRam)
 	}
 
 	if scrapSettings.MinPrice != "" || scrapSettings.MaxPrice != "" {
@@ -81,26 +121,123 @@ func applyScrapSettingsFravega(url string, scrapSettings *utils.Settings, pageNu
 	return url
 }
 
-func apply_ram_settings(url string, ram string) string {
-	if ram <= "4" {
-		url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes"
-	} else if ram <= "8" {
-		url += "&memoria-ram=8-gigabytes%2C16-gigabytes%2C32-gigabytes"
-	} else {
-		url += "&memoria-ram=16-gigabytes%2C32-gigabytes"
+func apply_ram_settings(url string, minRamS string, maxRamS string) string {
+
+	// convertir a int para comparar
+	minRam, _ := strconv.Atoi(minRamS)
+	maxRam, _ := strconv.Atoi(maxRamS)
+
+	if minRam == 0 && maxRam > 0 { // Si se especifica solo el maximo
+		if maxRam <= 2 {
+			url += "&memoria-ram=2-gigabytes"
+		} else if maxRam <= 4 {
+			url += "&memoria-ram=4-gigabytes"
+		} else if maxRam <= 8 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes"
+		} else if maxRam <= 16 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes"
+		} else if maxRam <= 32 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes"
+		} else {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		}
+	} else if minRam > 0 && maxRam == 0 { // Si se especifica solo el minimo
+		if minRam <= 2 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 4 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 8 {
+			url += "&memoria-ram=8-gigabytes%2C16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 16 {
+			url += "&memoria-ram=16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 32 {
+			url += "&memoria-ram=32-gigabytes%2C64-gigabytes"
+		} else {
+			url += "&memoria-ram=64-gigabytes"
+		}
+	} else if minRam > 0 && maxRam > 0 { // Si se especifica el minimo y el maximo
+		if minRam <= 2 && maxRam <= 2 {
+			url += "&memoria-ram=2-gigabytes"
+		} else if minRam <= 2 && maxRam <= 4 {
+			url += "&memoria-ram=2-gigabytes%2C4-gigabytes"
+		} else if minRam <= 2 && maxRam <= 8 {
+			url += "&memoria-ram=2-gigabytes%2C4-gigabytes%2C8-gigabytes"
+		} else if minRam <= 2 && maxRam <= 16 {
+			url += "&memoria-ram=2-gigabytes%2C4-gigabytes%2C8-gigabytes%2C16-gigabytes"
+		} else if minRam <= 2 && maxRam <= 32 {
+			url += "&memoria-ram=2-gigabytes%2C4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes"
+		} else if minRam <= 2 && maxRam <= 64 {
+			url += "&memoria-ram=2-gigabytes%2C4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 4 && maxRam <= 4 {
+			url += "&memoria-ram=4-gigabytes"
+		} else if minRam <= 4 && maxRam <= 8 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes"
+		} else if minRam <= 4 && maxRam <= 16 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes"
+		} else if minRam <= 4 && maxRam <= 32 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes"
+		} else if minRam <= 4 && maxRam <= 64 {
+			url += "&memoria-ram=4-gigabytes%2C8-gigabytes%2C16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 8 && maxRam <= 8 {
+			url += "&memoria-ram=8-gigabytes"
+		} else if minRam <= 8 && maxRam <= 16 {
+			url += "&memoria-ram=8-gigabytes%2C16-gigabytes"
+		} else if minRam <= 8 && maxRam <= 32 {
+			url += "&memoria-ram=8-gigabytes%2C16-gigabytes%2C32-gigabytes"
+		} else if minRam <= 8 && maxRam <= 64 {
+			url += "&memoria-ram=8-gigabytes%2C16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 16 && maxRam <= 16 {
+			url += "&memoria-ram=16-gigabytes"
+		} else if minRam <= 16 && maxRam <= 32 {
+			url += "&memoria-ram=16-gigabytes%2C32-gigabytes"
+		} else if minRam <= 16 && maxRam <= 64 {
+			url += "&memoria-ram=16-gigabytes%2C32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 32 && maxRam <= 32 {
+			url += "&memoria-ram=32-gigabytes"
+		} else if minRam <= 32 && maxRam <= 64 {
+			url += "&memoria-ram=32-gigabytes%2C64-gigabytes"
+		} else if minRam <= 64 && maxRam <= 64 {
+			url += "&memoria-ram=64-gigabytes"
+		}
 	}
+
 	return url
 }
 
-func apply_storage_settings(url string, storage string) string {
-	if storage == "1000" {
-		url += "%2Cmas-de-1-tb"
-	} else if storage <= "256" {
-		url += "&capacidad-de-disco=de-500-gb-a-1-tb%2Cmenos-500-gb%2Cmas-de-1-tb"
-	} else if storage <= "512" {
-		url += "&capacidad-de-disco=de-500-gb-a-1-tb%2Cmas-de-1-tb"
-	} else {
-		url += "&capacidad-de-disco=1-tb%2Cmas-de-1-tb%2Cde-500-gb-a-1-tb%2Cmenos-500-gb%2C240gb"
+func apply_storage_settings(url string, minStorageS string, maxStorageS string) string {
+
+	// convertir a int para comparar
+	minStorage, _ := strconv.Atoi(minStorageS)
+	maxStorage, _ := strconv.Atoi(maxStorageS)
+
+	if minStorage == 0 && maxStorage > 0 { // Si se especifica solo el maximo
+		if maxStorage <= 500 {
+			url += "&capacidad-de-disco=menos-500-gb"
+		} else if maxStorage <= 1000 {
+			url += "&capacidad-de-disco=menos-500-gb%2Cde-500-gb-a-1-tb"
+		} else {
+			url += "&capacidad-de-disco=menos-500-gb%2Cde-500-gb-a-1-tb%2Cmas-de-1-tb"
+		}
+	} else if minStorage > 0 && maxStorage == 0 { // Si se especifica solo el minimo
+		if minStorage <= 500 {
+			url += "&capacidad-de-disco=menos-500-gb%2Cde-500-gb-a-1-tb%2Cmas-de-1-tb"
+		} else if minStorage <= 1000 {
+			url += "&capacidad-de-disco=de-500-gb-a-1-tb%2Cmas-de-1-tb"
+		} else {
+			url += "&capacidad-de-disco=mas-de-1-tb"
+		}
+	} else if minStorage > 0 && maxStorage > 0 { // Si se especifica el minimo y el maximo
+		if minStorage <= 500 && maxStorage <= 500 {
+			url += "&capacidad-de-disco=menos-500-gb"
+		} else if minStorage <= 500 && maxStorage <= 1000 {
+			url += "&capacidad-de-disco=menos-500-gb%2Cde-500-gb-a-1-tb"
+		} else if minStorage <= 500 && maxStorage > 1000 {
+			url += "&capacidad-de-disco=menos-500-gb%2Cde-500-gb-a-1-tb%2Cmas-de-1-tb"
+		} else if minStorage <= 1000 && maxStorage <= 1000 {
+			url += "&capacidad-de-disco=de-500-gb-a-1-tb"
+		} else if minStorage <= 1000 && maxStorage > 1000 {
+			url += "&capacidad-de-disco=de-500-gb-a-1-tb%2Cmas-de-1-tb"
+		}
 	}
 	return url
 }
@@ -139,7 +276,7 @@ func extractProcessor(input string, specs *utils.Specs) {
 
 		substrings := strings.Fields(input)
 		// Result string
-		result := "RYZEN"
+		result := "AMD"
 
 		// Flag to indicate whether to include the substring in the result
 		include := false
@@ -156,7 +293,7 @@ func extractProcessor(input string, specs *utils.Specs) {
 				result += " " + substring
 			}
 
-			if strings.Contains(substring, "RYZEN") {
+			if strings.Contains(substring, "RYZEN") || strings.Contains(substring, "AMD") {
 				include = true
 			}
 		}
