@@ -14,11 +14,10 @@ type Product struct {
 	Price  int    `json:"price"`
 	Url    string `json:"url"`
 	Origin string `json:"origin"`
-	// Specs Specs `json:"specs"`
-} // TODO: Agregar un member "Specs", que sea otro struct que contenga la especificaciones del producto
+	// Specs Specs `json:"specs"` // TODO: Descomentar cuando se implemente en todos los endpoints
+}
 
 // Struct utilizado para almacenar las especificaciones de un producto
-// TODO: Implementar para traer estos datos de todos los productos en la respuesta
 type Specs struct {
 	Processor string `json:"processor"`
 	Ram       string `json:"ram"`
@@ -27,6 +26,8 @@ type Specs struct {
 }
 
 // Struct utilizado para almacenar la configuracion para scrapear
+// IMPORTANTE: Esta deprecado, usar el struct de abajo (se deja hasta que se implemente con el nuevo struct
+// en todos los endpoints. Despues quitar)
 type Settings struct {
 	Ram       string // La memoria ram a partir de la que se busca (4, 8, etc)
 	Inches    string // Las pulgadas a partir de las que se busca (16, 17, etc)
@@ -35,6 +36,20 @@ type Settings struct {
 	MinPrice  string // Precio minimo (200000, por ejemplo)
 	MaxPrice  string // Precio maximo (2000000, por ejemplo)
 }
+
+// Struct utilizado para almacenar la configuracion para scrapear
+// TODO: Implementar este struct en todos los endpoints
+// type Settings struct {
+// 	MinRam     string // Cantidad de memoria ram
+// 	MaxRam     string
+// 	MinInches  string // Pulgadas de la pantalla
+// 	MaxInches  string
+// 	MinStorage string // Espacio en disco del ssd
+// 	MaxStorage string
+// 	MinPrice   string // Precio del equipo
+// 	MaxPrice   string
+// 	Processor  string // Linea del procesador (intel, amd, apple)
+// }
 
 // Convierte un precio de formato string a un entero
 func ConvertPriceToNumber(price string) int {
@@ -97,11 +112,26 @@ func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) bo
 	return false
 }
 
-// Devuelve el limite correcto
-func GetCorrectLimit(limit int) int {
-	if limit <= 0 || limit > constants.MaxProductsToScrap {
-		return constants.MaxProductsToScrap
+// Devuelve los productos a scrapear a partir del limite
+func LimitProducts(limit int, products []Product) []Product {
+	if limit > len(products) {
+		return products // Se traen todos los productos pues no superan el limite
 	}
 
-	return limit
+	return products[:limit]
+}
+
+// Devuelve el limite correcto, como entero
+func GetCorrectLimit(limit string) int {
+	if limit == "" {
+		return constants.MaxProductsToScrap // No hay limite definido, se devuelve el maximo
+	}
+
+	limitNum, _ := strconv.Atoi(limit)
+	if limitNum > constants.MaxProductsToScrap {
+		return constants.MaxProductsToScrap // El limite supera el maximo, se devuelve el maximo
+	}
+
+	// El limite es menor que el maximo, se devuelve
+	return limitNum
 }
