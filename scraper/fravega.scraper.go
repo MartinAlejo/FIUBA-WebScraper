@@ -332,6 +332,34 @@ func extractProcessor(input string, specs *utils.Specs) {
 		result = strings.TrimSpace(result)
 
 		specs.Processor = result
+	} else if strings.Contains(input, "APPLE") || strings.Contains(input, "MAC") || strings.Contains(input, "MACBOOK") {
+		substrings := strings.Fields(input)
+		// Result string
+		result := "APPLE"
+
+		// Flag to indicate whether to include the substring in the result
+		include := false
+
+		// Iterate through the substrings
+		for _, substring := range substrings {
+			// Check if the substring contains "GB", "TB" or "SSD"
+			if strings.Contains(substring, "GB") || strings.Contains(substring, "TB") || strings.Contains(substring, "SSD") {
+				break
+			}
+
+			// Check if the substring contains "INTEL"
+			if include {
+				result += " " + substring
+			}
+
+			if strings.Contains(substring, "APPLE") {
+				include = true
+			}
+		}
+
+		// Trim leading space from the result
+		result = strings.TrimSpace(result)
+		specs.Processor = result
 	} else {
 		result := ""
 		re := regexp.MustCompile(`(?:I[0-9]+-[0-9A-Za-z]+)|(?:I[0-9]+\s[0-9A-Za-z]+)`)
