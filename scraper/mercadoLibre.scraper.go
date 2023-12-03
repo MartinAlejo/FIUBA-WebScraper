@@ -21,6 +21,7 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 			Price:  utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction")),
 			Url:    e.ChildAttr("a", "href"),
 			Origin: "Mercado Libre",
+			Specs:  parseProductSpecs(e.ChildText(".ui-search-item__title")),
 		}
 
 		products = append(products, product)
@@ -86,4 +87,15 @@ func applyScrapSettingsMercadoLibre(url string, scrapSettings *utils.Settings) s
 	visitUrl := url + urlSuffix + "_NoIndex_True"
 
 	return visitUrl
+}
+
+// Parsea los specs de un producto
+func parseProductSpecs(input string) utils.Specs {
+	var specs utils.Specs
+
+	// extractRamAndStorage(input, &specs)
+	// extractProcessor(input, &specs)
+	// extractInches(input, &specs)
+
+	return specs
 }
