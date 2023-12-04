@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"go-scraper/constants"
 	"go-scraper/utils"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
@@ -21,7 +24,7 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 			Price:  utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction")),
 			Url:    e.ChildAttr("a", "href"),
 			Origin: "Mercado Libre",
-			Specs:  parseProductSpecs(e.ChildText(".ui-search-item__title")),
+			Specs:  parseSpecsMercadoLibre(e.ChildText(".ui-search-item__title")),
 		}
 
 		products = append(products, product)
@@ -42,7 +45,7 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 	visitUrl := applyScrapSettingsMercadoLibre(url, &scrapSettings)
 
 	// Se visita el sitio a scrapear y se devuelven los productos
-	// fmt.Println(visitUrl) //TODO: Quitar (test)
+	fmt.Println(visitUrl) // TODO: Quitar (test)
 
 	c.Visit(visitUrl)
 
@@ -90,12 +93,109 @@ func applyScrapSettingsMercadoLibre(url string, scrapSettings *utils.Settings) s
 }
 
 // Parsea los specs de un producto
-func parseProductSpecs(input string) utils.Specs {
+func parseSpecsMercadoLibre(input string) utils.Specs {
 	var specs utils.Specs
 
-	// extractRamAndStorage(input, &specs)
+	extractRamAndStorageMercadoLibre(input, &specs)
 	// extractProcessor(input, &specs)
-	// extractInches(input, &specs)
+	extractInchesMercadoLibre(input, &specs)
 
 	return specs
+}
+
+func extractInchesMercadoLibre(input string, specs *utils.Specs) {
+	// Expresión regular para capturar pulgadas con o sin decimales seguido opcionalmente por comillas o barra invertida
+	inchesRegex := regexp.MustCompile(`(\d+(?:,\d+)?(?:\.\d+)?)\\?"?“?`)
+	// Buscar todas las coincidencias en la cadena
+	matches := inchesRegex.FindAllStringSubmatch(input, -1)
+
+	// Iterar sobre las coincidencias
+	for _, match := range matches {
+		// Verificar si se encontró un valor válido y está en el rango deseado
+		if len(match) >= 2 {
+			inches, err := strconv.ParseFloat(match[1], 64)
+			if err == nil && inches >= 10 && inches <= 20 {
+				specs.Inches = match[1]
+				break // Salir del bucle si se encuentra una coincidencia válida
+			}
+		}
+	}
+}
+
+func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
+	// Extract RAM and Storage using regular expressions
+	ramRegex := regexp.MustCompile(`(\d+)(GB|gb)`)
+	storageRegex := regexp.MustCompile(`(\d+)((GB|gb)|(TB|tb))`)
+
+	ramMatches := ramRegex.FindAllStringSubmatch(input, -1)
+	storageMatches := storageRegex.FindAllStringSubmatch(input, -1)
+
+	fmt.Println(input)
+	fmt.Println(ramMatches)
+	fmt.Println(storageMatches)
+
+	// Find the largest RAM value
+	maxRam := 0
+	for _, match := range ramMatches {
+		ram, err := strconv.Atoi(match[1])
+		if err == nil && ram > maxRam {
+			maxRam = ram
+		}
+	}
+
+	// Assign RAM based on the largest value
+	for _, match := range ramMatches {
+		ram, _ := strconv.Atoi(match[1])
+		if ram == maxRam {
+			specs.Ram = match[0]
+		}
+	}
+
+	// Assign Storage based on the remaining matches
+	for _, match := range storageMatches {
+		isStorage := false
+
+		if specs.Ram == "" || match[0] != specs.Ram {
+			isStorage = true
+		}
+
+		if isStorage {
+			specs.Storage = match[0]
+		}
+	}
+
+	if !strings.Contains(specs.Storage, "TB") || !strings.Contains(specs.Storage, "tb") {
+		// Swap values of Ram and Storage
+		specs.Ram, specs.Storage = specs.Storage, specs.Ram
+	}
+
+	if strings.Contains(specs.Storage, "GB") || strings.Contains(specs.Storage, "gb") {
+		// Primer desempate de matcheo entre Ram y Storage
+		storage := strings.Split(strings.ToLower(specs.Storage), "g")[0]
+		storageNum, _ := strconv.Atoi(storage)
+
+		if storageNum < 64 {
+			specs.Ram = specs.Storage
+			specs.Storage = ""
+		}
+	}
+
+	if strings.Contains(specs.Ram, "TB") || strings.Contains(specs.Ram, "tb") {
+		specs.Ram, specs.Storage = specs.Storage, specs.Ram
+	}
+
+	if specs.Storage == "" || strings.EqualFold(specs.Storage, specs.Ram) {
+		// Buscar por el string: 512GB, 1TB, 2TB, 256GB, 128GB, 64GB, 512, SSD 512
+		expr := `(SSD\s*\d+)|((\d+)\s*SSD)|((\d+)\s*TB)`
+		re := regexp.MustCompile(expr)
+		match := re.FindStringSubmatch(input)
+
+		if len(match) > 0 {
+			foundStorage := match[1] // Utilizar la primera coincidencia
+			if !strings.EqualFold(foundStorage, specs.Ram) {
+				specs.Storage = foundStorage
+			}
+		}
+	}
+
 }
