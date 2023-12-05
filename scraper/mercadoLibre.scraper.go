@@ -105,9 +105,12 @@ func parseSpecsMercadoLibre(input string) utils.Specs {
 
 func extractInchesMercadoLibre(input string, specs *utils.Specs) {
 	// Expresión regular para capturar pulgadas con o sin decimales seguido opcionalmente por comillas o barra invertida
-	inchesRegex := regexp.MustCompile(`(\d+(?:,\d+)?(?:\.\d+)?)\\?"?“?`)
+	inchesRegex := regexp.MustCompile(`(\d+(?:,\d+)?(?:\.\d+)?)\s?"?“?'?`)
 	// Buscar todas las coincidencias en la cadena
 	matches := inchesRegex.FindAllStringSubmatch(input, -1)
+
+	// fmt.Println(input)
+	// fmt.Println(matches)
 
 	// Iterar sobre las coincidencias
 	for _, match := range matches {
@@ -124,15 +127,15 @@ func extractInchesMercadoLibre(input string, specs *utils.Specs) {
 
 func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 	// Extract RAM and Storage using regular expressions
-	ramRegex := regexp.MustCompile(`(\d+)(GB|gb)`)
-	storageRegex := regexp.MustCompile(`(\d+)((GB|gb)|(TB|tb))`)
+	ramRegex := regexp.MustCompile(`(\d+)\s?(GB|gb)`)
+	storageRegex := regexp.MustCompile(`(\d+)\s?((GB|gb)|(TB|tb))`)
 
 	ramMatches := ramRegex.FindAllStringSubmatch(input, -1)
 	storageMatches := storageRegex.FindAllStringSubmatch(input, -1)
 
-	fmt.Println(input)
-	fmt.Println(ramMatches)
-	fmt.Println(storageMatches)
+	// fmt.Println(input)
+	// fmt.Println(ramMatches)
+	// fmt.Println(storageMatches)
 
 	// Find the largest RAM value
 	maxRam := 0
@@ -186,7 +189,7 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 
 	if specs.Storage == "" || strings.EqualFold(specs.Storage, specs.Ram) {
 		// Buscar por el string: 512GB, 1TB, 2TB, 256GB, 128GB, 64GB, 512, SSD 512
-		expr := `(SSD\s*\d+)|((\d+)\s*SSD)|((\d+)\s*TB)`
+		expr := `(SSD\s*\d+)|((\d+)\s*SSD)|((\d+)\s*TB)|(ssd\s*\d+)|((\d+)\s*ssd)|((\d+)\s*tb)`
 		re := regexp.MustCompile(expr)
 		match := re.FindStringSubmatch(input)
 
