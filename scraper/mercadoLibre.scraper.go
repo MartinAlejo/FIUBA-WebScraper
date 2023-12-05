@@ -97,8 +97,8 @@ func parseSpecsMercadoLibre(input string) utils.Specs {
 	var specs utils.Specs
 
 	extractRamAndStorageMercadoLibre(input, &specs)
-	// extractProcessor(input, &specs)
 	extractInchesMercadoLibre(input, &specs)
+	extractProcessorMercadoLibre(input, &specs)
 
 	return specs
 }
@@ -201,4 +201,79 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 		}
 	}
 
+}
+
+func extractProcessorMercadoLibre(input string, specs *utils.Specs) {
+
+	if strings.Contains(strings.ToUpper(input), "RYZEN") {
+		substrings := strings.Fields(input)
+		// Result string
+		result := "RYZEN"
+
+		// Flag to indicate whether to include the substring in the result
+		include := false
+
+		// Iterate through the substrings
+		for _, substring := range substrings {
+			// Check if the substring contains "GB"
+			if strings.Contains(substring, "GB") {
+				break
+			}
+
+			// Check if the substring contains "RYZEN"
+			if include {
+				result += " " + substring
+			}
+
+			if strings.Contains(substring, "RYZEN") {
+				include = true
+			}
+		}
+
+		// Trim leading space from the result
+		result = strings.TrimSpace(result)
+
+		specs.Processor = result
+
+	} else if strings.Contains(strings.ToUpper(input), "INTEL") {
+		substrings := strings.Fields(input)
+		// Result string
+		result := "INTEL"
+
+		// Flag to indicate whether to include the substring in the result
+		include := false
+
+		// Iterate through the substrings
+		for _, substring := range substrings {
+			// Check if the substring contains "GB", "TB" or "SSD"
+			if strings.Contains(substring, "GB") || strings.Contains(substring, "TB") || strings.Contains(substring, "SSD") {
+				break
+			}
+
+			// Check if the substring contains "INTEL"
+			if include {
+				result += " " + substring
+			}
+
+			if strings.Contains(substring, "INTEL") {
+				include = true
+			}
+		}
+
+		// Trim leading space from the result
+		result = strings.TrimSpace(result)
+
+		specs.Processor = result
+	} else if strings.Contains(strings.ToUpper(input), "MAC") || strings.Contains(strings.ToUpper(input), "APPLE") {
+		specs.Processor = "APPLE"
+	} else {
+		re := regexp.MustCompile(`(?:I[0-9]+-[0-9A-Za-z]+)|(?:I[0-9]+\s[0-9A-Za-z]+)|(I[0-9]+)`)
+
+		// Find the match in the input string
+		match := re.FindString(input)
+
+		if match != "" {
+			specs.Processor = "INTEL"
+		}
+	}
 }
