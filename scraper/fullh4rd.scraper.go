@@ -111,7 +111,7 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 		url += fmt.Sprintf("%s%s", appendStr, result)
 	}
 
-	if scrapSettings.Processor != "" {
+	if !(scrapSettings.Processor == "") {
 
 		if scrapSettings.Processor == "amd" {
 			url += fmt.Sprintf("%s%s", appendStr, "ryzen")
@@ -133,7 +133,6 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 
 	// Se crea y devuelve la url que finalmente se va a scrapear
 	visitUrl := url
-
 	return visitUrl
 }
 
