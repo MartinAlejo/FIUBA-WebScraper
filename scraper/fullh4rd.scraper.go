@@ -37,7 +37,7 @@ func ScrapFullH4rd(url string, scrapSettings utils.Settings) []utils.Product {
 		}
 
 		productName := e.ChildText("h3")
-		specs := parseSpecs(productName)
+		specs := parseSpecsFullH4rd(productName)
 
 		product := utils.Product{
 			Name:   productName,
@@ -194,7 +194,7 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
 	}
 }
 
-func parseSpecs(input string) utils.Specs {
+func parseSpecsFullH4rd(input string) utils.Specs {
 	var specs utils.Specs
 
 	ramRegex := regexp.MustCompile(`(\d+)GB`)

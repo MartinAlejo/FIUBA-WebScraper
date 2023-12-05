@@ -45,3 +45,36 @@ func ValidateSettings(scrapSettings utils.Settings, w http.ResponseWriter) bool 
 
 	return true
 }
+
+// Valida que el limite sea correcto
+func ValidateLimit(limit string, w http.ResponseWriter) bool {
+	if limit == "" {
+		return true
+	}
+
+	limitNum, err := strconv.Atoi(limit)
+
+	if err != nil {
+		return utils.SendErrorResponse(w, "Limit must be a number", http.StatusBadRequest)
+	}
+
+	if limitNum <= 0 {
+		return utils.SendErrorResponse(w, "Limit must be a positive number", http.StatusBadRequest)
+	}
+
+	return true
+}
+
+// Valida que el sort sea correcto
+func ValidateSort(sort string, w http.ResponseWriter) bool {
+	if sort == "" {
+		return true
+	}
+
+	if slices.Contains(constants.Sorting, sort) {
+		return true
+	}
+
+	errMessage := "sort must be either: " + strings.Join(constants.Sorting, ", ")
+	return utils.SendErrorResponse(w, errMessage, http.StatusBadRequest)
+}
