@@ -88,7 +88,15 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 	}
 
 	if scrapSettings.Storage != "" {
-		url += fmt.Sprintf("%s%sgb", appendStr, scrapSettings.Storage)
+
+		if scrapSettings.Storage == "1000" {
+
+			url += fmt.Sprintf("%s1tb", appendStr)
+		} else {
+
+			url += fmt.Sprintf("%s%sgb", appendStr, scrapSettings.Storage)
+		}
+
 	}
 
 	if scrapSettings.Inches != "" {
@@ -161,7 +169,12 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
 		}
 
 		if !(scrapSettings.Storage == "") {
+
 			storage := scrapSettings.Storage + `gb`
+			if scrapSettings.Storage == "1000" {
+				storage = "1tb"
+			}
+
 			if !strings.Contains(lowerName, storage) {
 				return false
 			}
@@ -184,14 +197,12 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
 func parseSpecs(input string) utils.Specs {
 	var specs utils.Specs
 
-	// Extract RAM and Storage using regular expressions
 	ramRegex := regexp.MustCompile(`(\d+)GB`)
 	storageRegex := regexp.MustCompile(`(\d+)(GB|TB|G)`)
 
 	ramMatches := ramRegex.FindAllStringSubmatch(input, -1)
 	storageMatches := storageRegex.FindAllStringSubmatch(input, -1)
 
-	// Find the largest RAM value
 	maxRam := 0
 	for _, match := range ramMatches {
 		ram, err := strconv.Atoi(match[1])
@@ -200,7 +211,6 @@ func parseSpecs(input string) utils.Specs {
 		}
 	}
 
-	// Assign RAM based on the largest value
 	for _, match := range ramMatches {
 		ram, _ := strconv.Atoi(match[1])
 		if ram == maxRam {
@@ -208,7 +218,6 @@ func parseSpecs(input string) utils.Specs {
 		}
 	}
 
-	// Assign Storage based on the remaining matches
 	for _, match := range storageMatches {
 		if specs.Ram == "" || match[0] != specs.Ram {
 			specs.Storage = match[0]
@@ -216,23 +225,19 @@ func parseSpecs(input string) utils.Specs {
 	}
 
 	if !strings.Contains(specs.Storage, "TB") {
-		// Swap values of Ram and Storage
+
 		specs.Ram, specs.Storage = specs.Storage, specs.Ram
 	}
 
-	// Check if Ram has the structure "number + 'G'"
 	if strings.HasSuffix(specs.Ram, "G") {
-		// Swap values of Ram and Storage
+
 		specs.Ram, specs.Storage = specs.Storage, specs.Ram
 	}
 
-	// Define a regular expression pattern to match the display size (integer or decimal)
 	displayPattern := regexp.MustCompile(`(\d+(\.\d+)?)\"`)
 
-	// Find the match in the string
 	match := displayPattern.FindStringSubmatch(input)
 
-	// Extract the display size from the match
 	if len(match) > 1 {
 		specs.Inches = match[1]
 	}
@@ -240,20 +245,17 @@ func parseSpecs(input string) utils.Specs {
 	if strings.Contains(input, "RYZEN") {
 
 		substrings := strings.Fields(input)
-		// Result string
+
 		result := "RYZEN"
 
-		// Flag to indicate whether to include the substring in the result
 		include := false
 
-		// Iterate through the substrings
 		for _, substring := range substrings {
-			// Check if the substring contains "GB"
+
 			if strings.Contains(substring, "GB") {
 				break
 			}
 
-			// Check if the substring contains "RYZEN"
 			if include {
 				result += " " + substring
 			}
@@ -263,7 +265,6 @@ func parseSpecs(input string) utils.Specs {
 			}
 		}
 
-		// Trim leading space from the result
 		result = strings.TrimSpace(result)
 
 		specs.Processor = result
@@ -272,11 +273,31 @@ func parseSpecs(input string) utils.Specs {
 		result := ""
 		re := regexp.MustCompile(`(?:I[0-9]+-[0-9A-Za-z]+)|(?:I[0-9]+\s[0-9A-Za-z]+)`)
 
-		// Find the match in the input string
 		match := re.FindString(input)
 
 		result = match
 		specs.Processor = result
 	}
+
+	if strings.Contains(specs.Processor, "RTX") {
+		specs.Processor = removeGPUFromProcessor(specs.Processor)
+	}
+
 	return specs
+}
+
+func removeGPUFromProcessor(processor string) string {
+
+	r := regexp.MustCompile(`RTX\s?\d+`)
+
+	result := r.ReplaceAllString(processor, "")
+
+	trimmed := strings.TrimSpace(result)
+
+	if len(trimmed) < len(result) {
+
+		trimmed = trimmed[:len(trimmed)-1]
+	}
+
+	return trimmed
 }
