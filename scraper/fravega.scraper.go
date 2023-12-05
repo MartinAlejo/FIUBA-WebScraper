@@ -35,7 +35,7 @@ func scrapFravegaPage(url string, products *[]utils.Product) *[]utils.Product {
 			Price:  utils.ConvertPriceToNumber(e.ChildText("span.sc-ad64037f-0.ixxpWu")),
 			Url:    "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 			Origin: "Fravega",
-			//Specs:  parseSpecs(strings.ToUpper(name)),
+			Specs:  parseSpecs(strings.ToUpper(name)),
 		}
 
 		*products = append(*products, product)
