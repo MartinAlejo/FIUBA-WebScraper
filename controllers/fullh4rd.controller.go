@@ -16,12 +16,15 @@ func FullH4rdGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Limite de productos a scrapear
 
 	scrapSettings := utils.Settings{
-		Ram:       r.URL.Query().Get("ram"),
-		Inches:    r.URL.Query().Get("inches"),
-		Storage:   r.URL.Query().Get("storage"),
-		Processor: r.URL.Query().Get("processor"),
-		MinPrice:  r.URL.Query().Get("minPrice"),
-		MaxPrice:  r.URL.Query().Get("maxPrice"),
+		MinRam:     r.URL.Query().Get("minRam"),
+		MaxRam:     r.URL.Query().Get("maxRam"),
+		MinInches:  r.URL.Query().Get("minInches"),
+		MaxInches:  r.URL.Query().Get("maxInches"),
+		MinStorage: r.URL.Query().Get("minStorage"),
+		MaxStorage: r.URL.Query().Get("maxStorage"),
+		Processor:  r.URL.Query().Get("processor"),
+		MinPrice:   r.URL.Query().Get("minPrice"),
+		MaxPrice:   r.URL.Query().Get("maxPrice"),
 	}
 
 	// Se scrapean los productos

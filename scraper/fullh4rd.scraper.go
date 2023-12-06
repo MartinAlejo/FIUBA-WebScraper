@@ -47,7 +47,7 @@ func ScrapFullH4rd(url string, scrapSettings utils.Settings) []utils.Product {
 			Specs:  specs,
 		}
 
-		if verifyProductFullH4rd(product.Name, &scrapSettings) && len(specs.Processor) > 7 {
+		if verifyProductFullH4rd(product.Name, &scrapSettings, specs) && len(specs.Processor) > 7 {
 
 			if maxPrice > 0 || minPrice > 0 {
 				if maxPrice != 0 && minPrice == 0 {
@@ -83,25 +83,26 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 	appendStr := "%20"
 
 	// Se aplican los settings para scrapear
-	if scrapSettings.Ram != "" {
-		url += fmt.Sprintf("%s%sgb", appendStr, scrapSettings.Ram)
+	if scrapSettings.MinRam == scrapSettings.MaxRam && !(scrapSettings.MinRam == "" && scrapSettings.MaxRam == "") {
+		fmt.Println("son giuales!!")
+		url += fmt.Sprintf("%s%sgb", appendStr, scrapSettings.MinRam)
 	}
 
-	if scrapSettings.Storage != "" {
+	if (scrapSettings.MinStorage == scrapSettings.MaxStorage) && !(scrapSettings.MinStorage == "" && scrapSettings.MaxStorage == "") {
 
-		if scrapSettings.Storage == "1000" {
+		if scrapSettings.MinStorage == "1000" {
 
 			url += fmt.Sprintf("%s1tb", appendStr)
 		} else {
 
-			url += fmt.Sprintf("%s%sgb", appendStr, scrapSettings.Storage)
+			url += fmt.Sprintf("%s%sgb", appendStr, scrapSettings.MinStorage)
 		}
 
 	}
 
-	if scrapSettings.Inches != "" {
+	if scrapSettings.MinInches == scrapSettings.MaxInches && !(scrapSettings.MinInches == "" && scrapSettings.MaxInches == "") {
 
-		floatValue, err := strconv.ParseFloat(scrapSettings.Inches, 64)
+		floatValue, err := strconv.ParseFloat(scrapSettings.MinInches, 64)
 		if err != nil {
 			fmt.Println("Error parsing float:", err)
 		}
@@ -137,7 +138,7 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 }
 
 // Funcion auxiliar, realiza validaciones para el scrapeo de productos de fullh4rd
-func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
+func verifyProductFullH4rd(name string, scrapSettings *utils.Settings, specs utils.Specs) bool {
 
 	lowerName := strings.ToLower(name)
 
@@ -145,43 +146,65 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings) bool {
 		!(strings.Contains(lowerName, "cooler")) {
 
 		// intel, amd o apple
+		fmt.Println(scrapSettings.Processor)
 		if !(scrapSettings.Processor == "") {
-
 			if scrapSettings.Processor == "amd" {
-
-				return strings.Contains(lowerName, "ryzen")
+				//return strings.Contains(lowerName, "ryzen")
+				if !(strings.Contains(lowerName, "ryzen")) {
+					return false
+				}
 			} else if scrapSettings.Processor == "apple" {
-
-				return strings.Contains(lowerName, "apple")
+				//return strings.Contains(lowerName, "apple")
+				if !(strings.Contains(lowerName, "apple")) {
+					return false
+				}
 			} else if scrapSettings.Processor == "intel" {
-
-				return !strings.Contains(lowerName, "apple") && !strings.Contains(lowerName, "amd") && !strings.Contains(lowerName, "ryzen")
+				//return !strings.Contains(lowerName, "apple") && !strings.Contains(lowerName, "amd") && !strings.Contains(lowerName, "ryzen")
+				if strings.Contains(lowerName, "apple") || strings.Contains(lowerName, "amd") || strings.Contains(lowerName, "ryzen") {
+					return false
+				}
 			}
-
 		}
 
-		if !(scrapSettings.Ram == "") {
-			ram := scrapSettings.Ram + `gb`
-			if !strings.Contains(lowerName, ram) {
+		// filtro de ram
+
+		if !(scrapSettings.MinRam == "") || !(scrapSettings.MaxRam == "") {
+			// ram := scrapSettings.Ram + `gb`
+			// if !strings.Contains(lowerName, ram) {
+			// 	return false
+			// }
+			fmt.Println("Hay algun filtro de Ram...")
+			isValid := isInRange(scrapSettings.MinRam, scrapSettings.MaxRam, specs.Ram)
+			if !isValid {
+				return false
+			}
+			//return isInRange(scrapSettings.MinRam, scrapSettings.MaxRam, specs.Ram)
+		}
+
+		if scrapSettings.MinStorage != "" || scrapSettings.MaxStorage != "" {
+			fmt.Println("Hay algun filtro de storage...")
+			// storage := scrapSettings.Storage + `gb`
+			// if scrapSettings.Storage == "1000" {
+			// 	storage = "1tb"
+			// }
+
+			// if !strings.Contains(lowerName, storage) {
+			// 	return false
+			// }
+			isValid := isInRange(scrapSettings.MinStorage, scrapSettings.MaxStorage, specs.Storage)
+			if !isValid {
 				return false
 			}
 		}
 
-		if !(scrapSettings.Storage == "") {
-
-			storage := scrapSettings.Storage + `gb`
-			if scrapSettings.Storage == "1000" {
-				storage = "1tb"
-			}
-
-			if !strings.Contains(lowerName, storage) {
-				return false
-			}
-		}
-
-		if !(scrapSettings.Inches == "") {
-			inches := scrapSettings.Inches + `"`
-			if !strings.Contains(lowerName, inches) {
+		if scrapSettings.MinInches != "" || scrapSettings.MaxInches != "" {
+			// inches := scrapSettings.Inches + `"`
+			// if !strings.Contains(lowerName, inches) {
+			// 	return false
+			// }
+			fmt.Println("Hay algun filtro de Inches...")
+			isValid := isInRange(scrapSettings.MinInches, scrapSettings.MaxInches, specs.Inches)
+			if !isValid {
 				return false
 			}
 		}
@@ -299,4 +322,45 @@ func removeGPUFromProcessor(processor string) string {
 	}
 
 	return trimmed
+}
+
+func isInRange(minValue string, maxValue string, value string) bool {
+
+	numValue := extractNumber(value)
+	fmt.Println("Value: ", value)
+	fmt.Println("Min value: ", minValue)
+	fmt.Println("Max value: ", maxValue)
+
+	if minValue == "" {
+
+		numMaxValue, _ := strconv.ParseFloat(maxValue, 64)
+		return numValue <= numMaxValue
+
+	} else if maxValue == "" {
+
+		numMinValue, _ := strconv.ParseFloat(minValue, 64)
+		return numValue >= numMinValue
+	} else {
+		numMaxValue, _ := strconv.ParseFloat(maxValue, 64)
+		numMinValue, _ := strconv.ParseFloat(minValue, 64)
+		return (numValue >= numMinValue && numValue <= numMaxValue)
+
+	}
+}
+
+func extractNumber(input string) float64 {
+
+	re := regexp.MustCompile(`[^\d.]`)
+	numericStr := re.ReplaceAllString(input, "")
+
+	num, err := strconv.ParseFloat(numericStr, 64)
+	if err != nil {
+		return 0
+	}
+
+	if strings.Contains(input, "TB") {
+		num *= 1000
+	}
+
+	return num
 }
