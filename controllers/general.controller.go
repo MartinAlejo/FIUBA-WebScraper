@@ -16,12 +16,15 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	limit := r.URL.Query().Get("limit") // Se recibe el limite por query params
 
 	scrapSettings := utils.Settings{
-		Ram:       r.URL.Query().Get("ram"),
-		Inches:    r.URL.Query().Get("inches"),
-		Storage:   r.URL.Query().Get("storage"),
-		Processor: r.URL.Query().Get("processor"),
-		MinPrice:  r.URL.Query().Get("minPrice"),
-		MaxPrice:  r.URL.Query().Get("maxPrice"),
+		MinRam:     r.URL.Query().Get("minRam"),
+		MaxRam:     r.URL.Query().Get("maxRam"),
+		MaxInches:  r.URL.Query().Get("maxInches"),
+		MinInches:  r.URL.Query().Get("minInches"),
+		MinStorage: r.URL.Query().Get("minStorage"),
+		MaxStorage: r.URL.Query().Get("maxStorage"),
+		Processor:  r.URL.Query().Get("processor"),
+		MinPrice:   r.URL.Query().Get("minPrice"),
+		MaxPrice:   r.URL.Query().Get("maxPrice"),
 	}
 
 	// Se hacen las validaciones (si no se cumplen se envia un error)
