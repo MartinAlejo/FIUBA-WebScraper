@@ -19,9 +19,17 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
+
+		minPrice := 50000
+		price := utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction"))
+
+		if price < minPrice {
+			return // Parche, ya que en ml hay servicios publicados (a bajo precio) como notebooks (error de ml)
+		}
+
 		product := utils.Product{
 			Name:   e.ChildText(".ui-search-item__title"),
-			Price:  utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction")),
+			Price:  price,
 			Url:    e.ChildAttr("a", "href"),
 			Origin: "Mercado Libre",
 			Specs:  parseSpecsMercadoLibre(e.ChildText(".ui-search-item__title")),
@@ -57,17 +65,43 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 func applyScrapSettingsMercadoLibre(url string, scrapSettings *utils.Settings) string {
 	urlSuffix := "/nuevo/notebooks"
 
+	fmt.Println(scrapSettings.MinRam)
+
 	// Se aplican los settings para scrapear
-	if scrapSettings.Ram != "" {
-		url += fmt.Sprintf("/mas-de-%s-GB", scrapSettings.Ram)
+	if scrapSettings.MinRam != "" || scrapSettings.MaxRam != "" {
+		if scrapSettings.MinRam == "" {
+			scrapSettings.MinRam = "0"
+		}
+
+		if scrapSettings.MaxRam == "" {
+			scrapSettings.MaxRam = "0"
+		}
+
+		url += fmt.Sprintf("/%s-a-%s-GB", scrapSettings.MinRam, scrapSettings.MaxRam)
 	}
 
-	if scrapSettings.Storage != "" {
-		url += fmt.Sprintf("/mas-de-%s-GB-capacidad-del-ssd", scrapSettings.Storage)
+	if scrapSettings.MinStorage != "" || scrapSettings.MaxStorage != "" {
+		if scrapSettings.MinStorage == "" {
+			scrapSettings.MinStorage = "0"
+		}
+
+		if scrapSettings.MaxStorage == "" {
+			scrapSettings.MaxStorage = "0"
+		}
+
+		url += fmt.Sprintf("/%s-a-%s-GB-capacidad-del-ssd", scrapSettings.MinStorage, scrapSettings.MaxStorage)
 	}
 
-	if scrapSettings.Inches != "" {
-		url += fmt.Sprintf("/mas-de-%s-pulgadas", scrapSettings.Inches)
+	if scrapSettings.MinInches != "" || scrapSettings.MaxInches != "" {
+		if scrapSettings.MinInches == "" {
+			scrapSettings.MinInches = "0"
+		}
+
+		if scrapSettings.MaxInches == "" {
+			scrapSettings.MaxInches = "0"
+		}
+
+		url += fmt.Sprintf("/%s-a-%s-pulgadas", scrapSettings.MinInches, scrapSettings.MaxInches)
 	}
 
 	if scrapSettings.Processor != "" {

@@ -36,7 +36,6 @@ func scrapFravegaPage(url string, products *[]utils.Product, scrapSettings utils
 			Url:    "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 			Origin: "Fravega",
 			Specs:  parseSpecs(strings.ToUpper(name)),
-
 		}
 		if validateFravegaProduct(&product.Specs, &scrapSettings) {
 			*products = append(*products, product)
