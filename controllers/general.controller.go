@@ -102,5 +102,7 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	allProducts = utils.LimitProducts(limitNum, allProducts)
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	json.NewEncoder(w).Encode(allProducts)
 }
