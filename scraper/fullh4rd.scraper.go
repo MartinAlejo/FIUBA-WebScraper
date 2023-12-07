@@ -84,7 +84,7 @@ func applyScrapSettingsFullH4rd(url string, scrapSettings *utils.Settings) strin
 
 	// Se aplican los settings para scrapear
 	if scrapSettings.MinRam == scrapSettings.MaxRam && !(scrapSettings.MinRam == "" && scrapSettings.MaxRam == "") {
-		fmt.Println("son giuales!!")
+
 		url += fmt.Sprintf("%s%sgb", appendStr, scrapSettings.MinRam)
 	}
 
@@ -146,7 +146,7 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings, specs uti
 		!(strings.Contains(lowerName, "cooler")) {
 
 		// intel, amd o apple
-		fmt.Println(scrapSettings.Processor)
+
 		if !(scrapSettings.Processor == "") {
 			if scrapSettings.Processor == "amd" {
 				//return strings.Contains(lowerName, "ryzen")
@@ -173,7 +173,7 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings, specs uti
 			// if !strings.Contains(lowerName, ram) {
 			// 	return false
 			// }
-			fmt.Println("Hay algun filtro de Ram...")
+
 			isValid := isInRange(scrapSettings.MinRam, scrapSettings.MaxRam, specs.Ram)
 			if !isValid {
 				return false
@@ -182,7 +182,7 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings, specs uti
 		}
 
 		if scrapSettings.MinStorage != "" || scrapSettings.MaxStorage != "" {
-			fmt.Println("Hay algun filtro de storage...")
+
 			// storage := scrapSettings.Storage + `gb`
 			// if scrapSettings.Storage == "1000" {
 			// 	storage = "1tb"
@@ -202,7 +202,7 @@ func verifyProductFullH4rd(name string, scrapSettings *utils.Settings, specs uti
 			// if !strings.Contains(lowerName, inches) {
 			// 	return false
 			// }
-			fmt.Println("Hay algun filtro de Inches...")
+
 			isValid := isInRange(scrapSettings.MinInches, scrapSettings.MaxInches, specs.Inches)
 			if !isValid {
 				return false
@@ -327,9 +327,6 @@ func removeGPUFromProcessor(processor string) string {
 func isInRange(minValue string, maxValue string, value string) bool {
 
 	numValue := extractNumber(value)
-	fmt.Println("Value: ", value)
-	fmt.Println("Min value: ", minValue)
-	fmt.Println("Max value: ", maxValue)
 
 	if minValue == "" {
 
