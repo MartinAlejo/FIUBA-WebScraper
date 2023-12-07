@@ -9,16 +9,16 @@ import (
 	"strconv"
 )
 
-// Envia las notebooks scrapeadas de Mercadolibre
-func MercadoLibreGetNotebooks(w http.ResponseWriter, r *http.Request) {
+// Envia las notebooks scrapeadas de Fravega
+func FravegaGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Limite de productos a scrapear
 
 	scrapSettings := utils.Settings{
 		MinRam:     r.URL.Query().Get("minRam"),
 		MaxRam:     r.URL.Query().Get("maxRam"),
-		MinInches:  r.URL.Query().Get("minInches"),
 		MaxInches:  r.URL.Query().Get("maxInches"),
+		MinInches:  r.URL.Query().Get("minInches"),
 		MinStorage: r.URL.Query().Get("minStorage"),
 		MaxStorage: r.URL.Query().Get("maxStorage"),
 		Processor:  r.URL.Query().Get("processor"),
@@ -27,8 +27,8 @@ func MercadoLibreGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Se scrapean los productos
-	visitUrl := "https://listado.mercadolibre.com.ar/computacion/laptops-accesorios/notebooks"
-	products := scraper.ScrapMercadoLibre(visitUrl, scrapSettings) // Se obtienen los productos scrapeados
+	visitUrl := "https://www.fravega.com/l/informatica/?keyword=notebook"
+	products := scraper.ScrapFravega(visitUrl, scrapSettings) // Se obtienen los productos scrapeados
 
 	// Se ordenan los productos
 	if sort == "asc" {
@@ -43,5 +43,7 @@ func MercadoLibreGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	json.NewEncoder(w).Encode(products)
 }
