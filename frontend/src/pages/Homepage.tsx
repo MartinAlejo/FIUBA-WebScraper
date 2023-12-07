@@ -81,25 +81,40 @@ const Card: React.FC<CardProps> = ({ element }) => {
     >
       <div>
         <span className="elementTitle">{element.name}</span>
-        <br />
+
         {element.specs.processor !== "" && (
-          <span className="specs">Processor: {element.specs.processor}</span>
+          <div>
+            <span className="specs">Processor: {element.specs.processor}</span>
+            <br />
+          </div>
         )}
-        <br />
+
         {element.specs.ram !== "" && (
-          <span className="specs">RAM: {element.specs.ram}</span>
+          <div>
+            <span className="specs">RAM: {element.specs.ram}</span>
+            <br />
+          </div>
         )}
-        <br />
+
         {element.specs.storage !== "" && (
-          <span className="specs">Storage: {element.specs.storage}</span>
+          <div>
+            <span className="specs">Storage: {element.specs.storage}</span>
+            <br />
+          </div>
         )}
-        <br />
+
         {element.specs.inches !== "" && (
-          <span className="specs">Screen Size: {element.specs.inches}</span>
+          <div>
+            <span className="specs">Screen Size: {element.specs.inches}</span>
+            <br />
+          </div>
         )}
-        <br />
+
         <span className="elementPrice">
-          Precio: ${element.price.toLocaleString()}
+          <div>
+            Precio: ${element.price.toLocaleString()}
+            <br />
+          </div>
         </span>
       </div>
       <img
