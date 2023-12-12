@@ -14,23 +14,30 @@ Al posicionarte en el directorio correspondiente, se pueden ejecutar los siguien
 
 ### Frontend
 
-### npm install
+```bash
+npm install
+```
 
 Instala las dependencias necesarias para levantar el frontend.
 
-#### npm start
+```bash
+npm start
+```
 
 Levanta el frontend en modo desarrollo.\
 Abrir [http://localhost:3000](http://localhost:3000) para verlo en el navegador.
 
 ### Backend
 
-#### go run .
+```bash
+go run .
+```
 
 Levanta el servidor en el puerto 8080.
 
 ## Endpoints
 
+Todas las llamadas a los endpoints son con método ***GET***\
 Recordar de anteponer [http://localhost:8080](http://localhost:8080) en las llamadas a la API.
 
 ### General
