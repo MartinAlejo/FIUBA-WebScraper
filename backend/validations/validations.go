@@ -18,47 +18,47 @@ func ValidateSettings(scrapSettings utils.Settings, w http.ResponseWriter) bool 
 		}
 	}
 	if scrapSettings.MinRam != "" {
-		if num, err := strconv.Atoi(scrapSettings.MinRam); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MinRam); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "minRam must be positive number", http.StatusBadRequest)
 		}
 	}
 
 	if scrapSettings.MaxRam != "" {
-		if num, err := strconv.Atoi(scrapSettings.MaxRam); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MaxRam); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "maxRam must be positive a number", http.StatusBadRequest)
 		}
 	}
 	if scrapSettings.MinInches != "" {
-		if num, err := strconv.Atoi(scrapSettings.MinInches); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MinInches); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "minInches must be a positive number", http.StatusBadRequest)
 		}
 	}
 	if scrapSettings.MaxInches != "" {
-		if num, err := strconv.Atoi(scrapSettings.MaxInches); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MaxInches); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "maxInches must be a positive number", http.StatusBadRequest)
 		}
 	}
 	if scrapSettings.MinStorage != "" {
-		if num, err := strconv.Atoi(scrapSettings.MinStorage); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MinStorage); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "minStorage must be a positive number", http.StatusBadRequest)
 		}
 	}
 	if scrapSettings.MaxStorage != "" {
-		if num, err := strconv.Atoi(scrapSettings.MaxStorage); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MaxStorage); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "maxStorage must be a positive number", http.StatusBadRequest)
 		}
 	}
 	if scrapSettings.MinPrice != "" {
-		if num, err := strconv.Atoi(scrapSettings.MinPrice); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MinPrice); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "minPrice must be a positive number", http.StatusBadRequest)
 		}
 	}
 	if scrapSettings.MaxPrice != "" {
-		if num, err := strconv.Atoi(scrapSettings.MaxPrice); err != nil || num < 0 {
+		if num, err := strconv.Atoi(scrapSettings.MaxPrice); err != nil || num <= 0 {
 			return utils.SendErrorResponse(w, "maxPrice must be a positive number", http.StatusBadRequest)
 		}
 	}
-	
+
 	// if !validateSettingsRanges(scrapSettings, w) {
 	// 	return false
 	// }
