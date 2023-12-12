@@ -1,6 +1,6 @@
 # Web Scraper API - TDL
 
-API desarrollada en GO, como TP para la materia: Teoría de Lenguaje
+API desarrollada en GO, como trabajo práctico para la materia: Teoría de Lenguaje
 
 ## Integrantes
 
@@ -37,7 +37,7 @@ Levanta el servidor en el puerto 8080.
 
 ## Endpoints
 
-Todas las llamadas a los endpoints son con método ***GET***\
+Todas las llamadas a los endpoints son con método ***GET***.\
 Recordar de anteponer [http://localhost:8080](http://localhost:8080) en las llamadas a la API.
 
 ### General
