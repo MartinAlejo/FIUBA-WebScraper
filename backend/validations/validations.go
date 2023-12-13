@@ -59,45 +59,42 @@ func ValidateSettings(scrapSettings utils.Settings, w http.ResponseWriter) bool 
 		}
 	}
 
-	// if !validateSettingsRanges(scrapSettings, w) {
-	// 	return false
-	// }
+	if !validateSettingsRanges(scrapSettings, w) {
+		return false
+	}
 
 	return true
 }
 
-// TODO: Arreglar
 // Valida que no haya errores en los rangos. Devuelve true si todo es valido, o responde
 // con un error si no lo es
-// func validateSettingsRanges(scrapSettings utils.Settings, w http.ResponseWriter) bool {
+func validateSettingsRanges(scrapSettings utils.Settings, w http.ResponseWriter) bool {
 
-// 	minRam, _ := strconv.Atoi(scrapSettings.MinRam)
+	minRam, _ := strconv.Atoi(scrapSettings.MinRam)
+	maxRam, _ := strconv.Atoi(scrapSettings.MaxRam)
+	minInches, _ := strconv.Atoi(scrapSettings.MinInches)
+	maxInches, _ := strconv.Atoi(scrapSettings.MaxInches)
+	minStorage, _ := strconv.Atoi(scrapSettings.MinStorage)
+	maxStorage, _ := strconv.Atoi(scrapSettings.MaxStorage)
+	minPrice, _ := strconv.Atoi(scrapSettings.MinPrice)
+	maxPrice, _ := strconv.Atoi(scrapSettings.MaxPrice)
 
-// 	// Por se recibe cero, se le asigna -1 para que no afecte a la validacion
-// 	maxRam, _ := strconv.Atoi(scrapSettings.MaxRam)
-// 	minInches, _ := strconv.Atoi(scrapSettings.MinInches)
-// 	maxInches, _ := strconv.Atoi(scrapSettings.MaxInches)
-// 	minStorage, _ := strconv.Atoi(scrapSettings.MinStorage)
-// 	maxStorage, _ := strconv.Atoi(scrapSettings.MaxStorage)
-// 	minPrice, _ := strconv.Atoi(scrapSettings.MinPrice)
-// 	maxPrice, _ := strconv.Atoi(scrapSettings.MaxPrice)
+	// Se valida que un rango minimo no sea mayor al maximo (si existen ambos rangos)
+	if scrapSettings.MinRam != "" && scrapSettings.MaxRam != "" && minRam > maxRam {
+		return utils.SendErrorResponse(w, "minRam must be equal or less than maxRam", http.StatusBadRequest)
+	}
+	if scrapSettings.MinInches != "" && scrapSettings.MaxInches != "" && minInches > maxInches {
+		return utils.SendErrorResponse(w, "minInches must be equal or less than maxInches", http.StatusBadRequest)
+	}
+	if scrapSettings.MinStorage != "" && scrapSettings.MaxStorage != "" && minStorage > maxStorage {
+		return utils.SendErrorResponse(w, "minStorage must be equal or less than maxStorage", http.StatusBadRequest)
+	}
+	if scrapSettings.MinPrice != "" && scrapSettings.MaxPrice != "" && minPrice > maxPrice {
+		return utils.SendErrorResponse(w, "minPrice must be equal or less than maxPrice", http.StatusBadRequest)
+	}
 
-// 	// validar que los rangos sean correctos
-// 	if minRam > maxRam {
-// 		return utils.SendErrorResponse(w, "minRam must be equal or less than maxRam", http.StatusBadRequest)
-// 	}
-// 	if minInches > maxInches {
-// 		return utils.SendErrorResponse(w, "minInches must be equal or less than maxInches", http.StatusBadRequest)
-// 	}
-// 	if minStorage > maxStorage {
-// 		return utils.SendErrorResponse(w, "minStorage must be equal or less than maxStorage", http.StatusBadRequest)
-// 	}
-// 	if maxPrice != 0 && minPrice > maxPrice {
-// 		return utils.SendErrorResponse(w, "minPrice must be equal or less than maxPrice", http.StatusBadRequest)
-// 	}
-
-// 	return true
-// }
+	return true
+}
 
 // Valida que el limite sea correcto
 func ValidateLimit(limit string, w http.ResponseWriter) bool {
