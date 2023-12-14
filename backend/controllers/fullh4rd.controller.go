@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"go-scraper/scraper"
 	"go-scraper/utils"
+	"go-scraper/validations"
 	"net/http"
 	"slices"
-	"strconv"
 )
 
 // Envia las notebooks scrapeadas de Fullh4rd
 func FullH4rdGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
-	sort := r.URL.Query().Get("sort")                    // Se recibe el sort por query params ("asc", "desc", "")
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit")) // Limite de productos a scrapear
+	sort := r.URL.Query().Get("sort")   // Se recibe el sort por query params ("asc", "desc", "")
+	limit := r.URL.Query().Get("limit") // Limite de productos a scrapear
 
 	scrapSettings := utils.Settings{
 		MinRam:     r.URL.Query().Get("minRam"),
@@ -27,6 +27,22 @@ func FullH4rdGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		MaxPrice:   r.URL.Query().Get("maxPrice"),
 	}
 
+	// Se hacen las validaciones (si no se cumplen se envia un error)
+	if !validations.ValidateSettings(scrapSettings, w) {
+		return
+	}
+
+	if !validations.ValidateSort(sort, w) {
+		return
+	}
+
+	if !validations.ValidateLimit(limit, w) {
+		return
+	}
+
+	// Si llego hasta aca, ya se valido todo correctamente
+	limitNum := utils.GetCorrectLimit(limit)
+
 	// Se scrapean los productos
 	visitUrl := "https://www.fullh4rd.com.ar/cat/search/notebook"
 	products := scraper.ScrapFullH4rd(visitUrl, scrapSettings)
@@ -38,10 +54,8 @@ func FullH4rdGetNotebooks(w http.ResponseWriter, r *http.Request) {
 		slices.SortFunc(products, utils.CmpProductDesc)
 	}
 
-	// Se traen hasta un limite
-	if limit > 0 && limit < len(products) {
-		products = products[:limit]
-	}
+	// Se traen los productos hasta un limite
+	products = utils.LimitProducts(limitNum, products)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
