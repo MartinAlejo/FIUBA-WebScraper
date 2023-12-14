@@ -41,8 +41,10 @@ func scrapFravegaPage(url string, products *[]utils.Product, scrapSettings utils
 			*products = append(*products, product)
 		}
 	})
-	println(url)
+	
+	//println(url)
 	c.Visit(url) // Se visita el sitio a scrapear
+
 	return products
 }
 

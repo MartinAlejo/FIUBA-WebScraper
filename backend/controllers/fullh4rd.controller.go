@@ -11,7 +11,6 @@ import (
 
 // Envia las notebooks scrapeadas de Fullh4rd
 func FullH4rdGetNotebooks(w http.ResponseWriter, r *http.Request) {
-
 	sort := r.URL.Query().Get("sort")   // Se recibe el sort por query params ("asc", "desc", "")
 	limit := r.URL.Query().Get("limit") // Limite de productos a scrapear
 

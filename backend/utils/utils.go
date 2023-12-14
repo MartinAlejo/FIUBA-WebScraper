@@ -14,7 +14,7 @@ type Product struct {
 	Price  int    `json:"price"`
 	Url    string `json:"url"`
 	Origin string `json:"origin"`
-	Specs  Specs  `json:"specs"` // TODO: Descomentar cuando se implemente en todos los endpoints
+	Specs  Specs  `json:"specs"`
 }
 
 // Struct utilizado para almacenar las especificaciones de un producto
@@ -26,9 +26,6 @@ type Specs struct {
 }
 
 // Struct utilizado para almacenar la configuracion para scrapear
-// IMPORTANTE: Esta deprecado, usar el struct de abajo (se deja hasta que se implemente con el nuevo struct
-// en todos los endpoints. Despues quitar)
-
 type Settings struct {
 	MinRam     string // Cantidad de memoria ram
 	MaxRam     string
@@ -40,20 +37,6 @@ type Settings struct {
 	MaxPrice   string
 	Processor  string // Linea del procesador (intel, amd, apple)
 }
-
-// Struct utilizado para almacenar la configuracion para scrapear
-// TODO: Implementar este struct en todos los endpoints
-// type Settings struct {
-// 	MinRam     string // Cantidad de memoria ram
-// 	MaxRam     string
-// 	MinInches  string // Pulgadas de la pantalla
-// 	MaxInches  string
-// 	MinStorage string // Espacio en disco del ssd
-// 	MaxStorage string
-// 	MinPrice   string // Precio del equipo
-// 	MaxPrice   string
-// 	Processor  string // Linea del procesador (intel, amd, apple)
-// }
 
 // Convierte un precio de formato string a un entero
 func ConvertPriceToNumber(price string) int {

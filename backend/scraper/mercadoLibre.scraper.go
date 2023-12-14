@@ -47,13 +47,11 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 		}
 	})
 
-	//TODO: Validaciones de input (query params)
-
 	// Se aplican los settings/filtros de scrapeo
 	visitUrl := applyScrapSettingsMercadoLibre(url, &scrapSettings)
 
 	// Se visita el sitio a scrapear y se devuelven los productos
-	fmt.Println(visitUrl) // TODO: Quitar (test)
+	//fmt.Println(visitUrl)
 
 	c.Visit(visitUrl)
 
@@ -64,8 +62,6 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 // una nueva url
 func applyScrapSettingsMercadoLibre(url string, scrapSettings *utils.Settings) string {
 	urlSuffix := "/nuevo/notebooks"
-
-	fmt.Println(scrapSettings.MinRam)
 
 	// Se aplican los settings para scrapear
 	if scrapSettings.MinRam != "" || scrapSettings.MaxRam != "" {
@@ -143,9 +139,6 @@ func extractInchesMercadoLibre(input string, specs *utils.Specs) {
 	// Buscar todas las coincidencias en la cadena
 	matches := inchesRegex.FindAllStringSubmatch(input, -1)
 
-	// fmt.Println(input)
-	// fmt.Println(matches)
-
 	// Iterar sobre las coincidencias
 	for _, match := range matches {
 		// Verificar si se encontró un valor válido y está en el rango deseado
@@ -166,10 +159,6 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 
 	ramMatches := ramRegex.FindAllStringSubmatch(input, -1)
 	storageMatches := storageRegex.FindAllStringSubmatch(input, -1)
-
-	// fmt.Println(input)
-	// fmt.Println(ramMatches)
-	// fmt.Println(storageMatches)
 
 	// Find the largest RAM value
 	maxRam := 0
