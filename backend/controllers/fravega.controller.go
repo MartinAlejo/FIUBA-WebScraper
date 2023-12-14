@@ -43,7 +43,7 @@ func FravegaGetNotebooks(w http.ResponseWriter, r *http.Request) {
 	limitNum := utils.GetCorrectLimit(limit)
 
 	// Se scrapean los productos
-	visitUrl := "https://www.fravega.com/l/informatica/?keyword=notebook"
+	visitUrl := "https://www.fravega.com/l/informatica/notebooks/?"
 	products := scraper.ScrapFravega(visitUrl, scrapSettings) // Se obtienen los productos scrapeados
 
 	// Se ordenan los productos
