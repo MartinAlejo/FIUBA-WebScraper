@@ -24,15 +24,14 @@ func ScrapFravega(url string, scrapSettings utils.Settings) []utils.Product {
 }
 
 func scrapFravegaPage(url string, products *[]utils.Product, scrapSettings utils.Settings) *[]utils.Product {
-
 	c := colly.NewCollector() // Crea una nueva instancia de Colly Collector
 
 	// Se define el comportamiento al scrapear
 	c.OnHTML("article[data-test-id='result-item']", func(e *colly.HTMLElement) {
-		name := e.ChildText("span[class='sc-6321a7c8-0 jKvHol']")
+		name := e.ChildText("span[class='sc-ca346929-0 czeMAx']")
 		product := utils.Product{
 			Name:   name,
-			Price:  utils.ConvertPriceToNumber(e.ChildText("span.sc-ad64037f-0.ixxpWu")),
+			Price:  utils.ConvertPriceToNumber(e.ChildText("span.sc-1d9b1d9e-0.OZgQ")),
 			Url:    "https://www.fravega.com.ar" + e.ChildAttr("a", "href"),
 			Origin: "Fravega",
 			Specs:  parseSpecs(strings.ToUpper(name)),
@@ -41,7 +40,7 @@ func scrapFravegaPage(url string, products *[]utils.Product, scrapSettings utils
 			*products = append(*products, product)
 		}
 	})
-	
+
 	//println(url)
 	c.Visit(url) // Se visita el sitio a scrapear
 
@@ -67,6 +66,10 @@ func validateFravegaProduct(specs *utils.Specs, scrapSettings *utils.Settings) b
 	processorSpecs := specs.Processor
 
 	if storage == 0 || ram == 0 || inches == 0 || processorSpecs == "" {
+		return false
+	}
+
+	if ram == storage {
 		return false
 	}
 
