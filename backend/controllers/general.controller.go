@@ -69,7 +69,7 @@ func GeneralGetNotebooks(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		defer wg.Done()
-		visitUrl := "https://www.fravega.com/l/informatica/?keyword=notebook"
+		visitUrl := "https://www.fravega.com/l/informatica/notebooks/?"
 		fravegaProducts := scraper.ScrapFravega(visitUrl, scrapSettings)
 		fravegaCh <- fravegaProducts
 	}()
