@@ -1,6 +1,6 @@
 # Web Scraper API - TDL
 
-API desarrollada en GO, como trabajo práctico para la materia: Teoría de Lenguaje
+API desarrollada en GO, como trabajo práctico para la materia: Teoría de Lenguaje.
 
 ## Integrantes
 
@@ -99,3 +99,8 @@ Scrapea notebooks de FullH4rd
 - Processor
 
     ***Nota**: Puede ser "amd", "intel" o "apple"*
+
+## Notas adicionales
+
+- Se debe contar con **Go** y **npm** previo a la ejecución del proyecto.
+- Los **specs** se obtuvieron con regex, por lo cual no siempre es posible obtener todos los datos, y la precisión no es del cien por ciento.
