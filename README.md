@@ -1,6 +1,6 @@
 # Web Scraper API - TDL
 
-API desarrollada en GO, como trabajo práctico para la materia: Teoría de Lenguaje.
+API desarrollada en *Go*, como trabajo práctico para la materia: *Teoría de Lenguaje*.
 
 ## Integrantes
 

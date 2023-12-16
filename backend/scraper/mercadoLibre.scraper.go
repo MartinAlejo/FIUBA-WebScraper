@@ -20,12 +20,7 @@ func ScrapMercadoLibre(url string, scrapSettings utils.Settings) []utils.Product
 	// Se define el comportamiento al scrapear
 	c.OnHTML(".ui-search-result__wrapper", func(e *colly.HTMLElement) {
 
-		minPrice := 50000
 		price := utils.ConvertPriceToNumber(e.ChildText("div.ui-search-item__group__element div.ui-search-price__second-line span.andes-money-amount__fraction"))
-
-		if price < minPrice {
-			return // Parche, ya que en ml hay servicios publicados (a bajo precio) como notebooks (error de ml)
-		}
 
 		product := utils.Product{
 			Name:   e.ChildText(".ui-search-item__title"),
