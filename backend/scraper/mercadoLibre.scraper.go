@@ -121,6 +121,7 @@ func applyScrapSettingsMercadoLibre(url string, scrapSettings *utils.Settings) s
 func parseSpecsMercadoLibre(input string) utils.Specs {
 	var specs utils.Specs
 
+	// Obtenemos Ram, Storage, Inches y Processor
 	extractRamAndStorageMercadoLibre(input, &specs)
 	extractInchesMercadoLibre(input, &specs)
 	extractProcessorMercadoLibre(input, &specs)
@@ -128,11 +129,12 @@ func parseSpecsMercadoLibre(input string) utils.Specs {
 	return specs
 }
 
+// Se obtienen las pulgadas de un producto y se almacena en los specs
 func extractInchesMercadoLibre(input string, specs *utils.Specs) {
+
 	// Expresión regular para capturar pulgadas con o sin decimales seguido opcionalmente por comillas o barra invertida
 	inchesRegex := regexp.MustCompile(`(\d+(?:,\d+)?(?:\.\d+)?)\s?"?“?'?`)
-	// Buscar todas las coincidencias en la cadena
-	matches := inchesRegex.FindAllStringSubmatch(input, -1)
+	matches := inchesRegex.FindAllStringSubmatch(input, -1) // Buscar todas las coincidencias en la cadena
 
 	// Iterar sobre las coincidencias
 	for _, match := range matches {
@@ -147,15 +149,16 @@ func extractInchesMercadoLibre(input string, specs *utils.Specs) {
 	}
 }
 
+// Se obtiene la ram de un producto y se almacena en los specs
 func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
-	// Extract RAM and Storage using regular expressions
+	// Se extrae la RAM y el Storage usando expresiones regulares
 	ramRegex := regexp.MustCompile(`(\d+)\s?(GB|gb)`)
 	storageRegex := regexp.MustCompile(`(\d+)\s?((GB|gb)|(TB|tb))`)
 
 	ramMatches := ramRegex.FindAllStringSubmatch(input, -1)
 	storageMatches := storageRegex.FindAllStringSubmatch(input, -1)
 
-	// Find the largest RAM value
+	// Se busca el mayor valor de RAM
 	maxRam := 0
 	for _, match := range ramMatches {
 		ram, err := strconv.Atoi(match[1])
@@ -164,7 +167,7 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 		}
 	}
 
-	// Assign RAM based on the largest value
+	// Se asigna la RAM basandonos en el mayor valor
 	for _, match := range ramMatches {
 		ram, _ := strconv.Atoi(match[1])
 		if ram == maxRam {
@@ -172,7 +175,7 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 		}
 	}
 
-	// Assign Storage based on the remaining matches
+	// Se asigna el Storage según las coincidencias restantes
 	for _, match := range storageMatches {
 		isStorage := false
 
@@ -186,8 +189,7 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 	}
 
 	if !strings.Contains(specs.Storage, "TB") || !strings.Contains(specs.Storage, "tb") {
-		// Swap values of Ram and Storage
-		specs.Ram, specs.Storage = specs.Storage, specs.Ram
+		specs.Ram, specs.Storage = specs.Storage, specs.Ram // Swap entre los valores de Ram y Storage
 	}
 
 	if strings.Contains(specs.Storage, "GB") || strings.Contains(specs.Storage, "gb") {
@@ -202,6 +204,7 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 	}
 
 	if strings.Contains(specs.Ram, "TB") || strings.Contains(specs.Ram, "tb") {
+		// Segundo desempate de matcheo entre Ram y Storage
 		specs.Ram, specs.Storage = specs.Storage, specs.Ram
 	}
 
@@ -221,24 +224,25 @@ func extractRamAndStorageMercadoLibre(input string, specs *utils.Specs) {
 
 }
 
+// Se obtiene el tipo de procesador de un producto y se almacena en los specs
 func extractProcessorMercadoLibre(input string, specs *utils.Specs) {
 
 	if strings.Contains(strings.ToUpper(input), "RYZEN") {
 		substrings := strings.Fields(input)
-		// Result string
 		result := "RYZEN"
 
-		// Flag to indicate whether to include the substring in the result
+		// Flag para indicar si se incluye el substring en el result
 		include := false
 
-		// Iterate through the substrings
+		// Se itera sobre los substrings
 		for _, substring := range substrings {
-			// Check if the substring contains "GB"
+
+			// Vemos si el substring contiene "GB"
 			if strings.Contains(substring, "GB") {
 				break
 			}
 
-			// Check if the substring contains "RYZEN"
+			// Vemos si el substring contiene "RYZEN"
 			if include {
 				result += " " + substring
 			}
@@ -248,27 +252,27 @@ func extractProcessorMercadoLibre(input string, specs *utils.Specs) {
 			}
 		}
 
-		// Trim leading space from the result
+		// Se quitan los espacios del string y se almacena
 		result = strings.TrimSpace(result)
 
 		specs.Processor = result
 
 	} else if strings.Contains(strings.ToUpper(input), "INTEL") {
 		substrings := strings.Fields(input)
-		// Result string
 		result := "INTEL"
 
-		// Flag to indicate whether to include the substring in the result
+		// Flag para indicar si se incluye el substring en el result
 		include := false
 
-		// Iterate through the substrings
+		// Se itera sobre los substrings
 		for _, substring := range substrings {
-			// Check if the substring contains "GB", "TB" or "SSD"
+
+			// Vemos si el substring contiene "GB", "TB" o "SSD"
 			if strings.Contains(substring, "GB") || strings.Contains(substring, "TB") || strings.Contains(substring, "SSD") {
 				break
 			}
 
-			// Check if the substring contains "INTEL"
+			// Vemos si el substring contiene "RYZEN"
 			if include {
 				result += " " + substring
 			}
@@ -278,16 +282,18 @@ func extractProcessorMercadoLibre(input string, specs *utils.Specs) {
 			}
 		}
 
-		// Trim leading space from the result
+		// Se quitan los espacios del string y se almacena
 		result = strings.TrimSpace(result)
 
 		specs.Processor = result
+
 	} else if strings.Contains(strings.ToUpper(input), "MAC") || strings.Contains(strings.ToUpper(input), "APPLE") {
-		specs.Processor = "APPLE"
+		specs.Processor = "APPLE" // Se almacena directamente
+
 	} else {
 		re := regexp.MustCompile(`(?:I[0-9]+-[0-9A-Za-z]+)|(?:I[0-9]+\s[0-9A-Za-z]+)|(I[0-9]+)`)
 
-		// Find the match in the input string
+		// Se busca coincidencia sobre el string
 		match := re.FindString(input)
 
 		if match != "" {
