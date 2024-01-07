@@ -42,7 +42,7 @@ Recordar de anteponer [http://localhost:8080](http://localhost:8080) en las llam
 
 ### General
 
-Scrapea notebooks de Mercado Libre, Fravega y Fullh4rd
+Scrapea notebooks de Mercado Libre, Fravega y FullH4rd
 
 ```bash
 /api/general
@@ -115,4 +115,4 @@ Scrapea notebooks de FullH4rd
 - Se debe contar con **Go** y **npm** previo a la ejecución del proyecto.
 - Los **specs** se obtuvieron con regex, por lo cual no siempre es posible obtener todos los datos, y la precisión no es del cien por ciento.
 - El scrapeo se realiza sobre las primeras 10 páginas de resultados (como máximo).
-- Si no sé específica un límite (o sé específica uno mayor), este será de 500 productos (por defecto).
+- Si no sé específica un límite (o sé específica uno mayor), este será por defecto de 500 productos.
