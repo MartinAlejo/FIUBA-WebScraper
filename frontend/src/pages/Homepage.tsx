@@ -133,7 +133,7 @@ export default function Homepage() {
 
     const url_start = `http://localhost:8080/api/${selectedChipLabel}?`;
     const url_specs = `minRam=${minRam}&maxRam=${maxRam}&minInches=${minScreen}&maxInches=${maxScreen}&minStorage=${minStorage}&maxStorage=${maxStorage}&processor=${processor}`;
-    const url_params = `&minPrice=${minPrice}&maxPrice=${maxPrice}&sort=asc&limit=${amount}`;
+    const url_params = `&minPrice=${minPrice}&maxPrice=${maxPrice}&sort=${sort}&limit=${amount}`;
     const url = url_start + url_specs + url_params;
     console.log(url);
 
