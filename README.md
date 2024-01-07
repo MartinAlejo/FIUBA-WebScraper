@@ -74,6 +74,16 @@ Scrapea notebooks de FullH4rd
 
 ## Query parameters
 
+### Sort:
+
+- sort
+
+    ***Nota**: Puede ser "asc" o "desc"*
+
+### Limit:
+
+- limit
+
 ### RAM:
 
 - MinRam
@@ -104,3 +114,5 @@ Scrapea notebooks de FullH4rd
 
 - Se debe contar con **Go** y **npm** previo a la ejecución del proyecto.
 - Los **specs** se obtuvieron con regex, por lo cual no siempre es posible obtener todos los datos, y la precisión no es del cien por ciento.
+- El scrapeo se realiza sobre las primeras 10 páginas de resultados (como máximo).
+- Si no sé específica un límite (o sé específica uno mayor), este será de 500 productos (por defecto).
